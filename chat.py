@@ -2,12 +2,8 @@ import openai
 
 
 class Chat:
-    def __init__(self, model_id, sys_msg, api_key, max_tokens, temperature):
-        self.model_id = model_id
-        self.sys_msg = sys_msg
-        self.api_key = api_key
-        self.max_tokens = max_tokens
-        self.temperature = temperature
+    def __init__(self, setting):
+        self.setting = setting
         self.history = []
 
     def user_input(self, input):
@@ -17,10 +13,10 @@ class Chat:
     def get_response(self):
         openai.api_key = self.api_key
         response = openai.ChatCompletion.create(
-            model=self.model_id,
-            messages=self.history,
-            max_tokens=self.max_tokens,
-            temperature=self.temperature
+            model=self.setting.model_id,
+            messages=self.setting.history,
+            max_tokens=self.setting.max_tokens,
+            temperature=self.setting.temperature
         )
         response_msg = {"role": "assistant",
                         "content": response.choices[0].text}
