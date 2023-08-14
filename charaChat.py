@@ -1,10 +1,9 @@
 from chat import Chat
-from setting import CharaSetting, ChatSetting
 from prompts import get_begin_prompts
 
 
 class CharaChat(Chat):
-    def __init__(self, charaSet: CharaSetting, chatSet: ChatSetting):
+    def __init__(self, charaSet: dict, chatSet: dict):
         super().__init__(chatSet)
         self.chara = charaSet
         self.initMsg()

@@ -1,20 +1,18 @@
-from setting import CharaSetting
-import string
 
 
-def get_intro_prompts(charaSet: CharaSetting):
+def get_intro_prompts(charaSet: dict):
     begin = f"""You are now going to perform as an imaginary character.
 
-Character name: {charaSet.name}
+Character name: {charaSet["name"]}
 
 Character sayings: 
     """
 
-    for saying in charaSet.sayings:
+    for saying in charaSet["sayings"]:
         begin += saying + '\n    '
 
     return [ {"role": "user", "content": begin}
-           , {"role": "assistant", "content": f"Ok, I am now going to perform as the imaginary character {charaSet.name}."}
+           , {"role": "assistant", "content": f"Ok, I am now going to perform as the imaginary character {charaSet['name']}."}
            ]
 
 
@@ -26,7 +24,7 @@ info_point_prompts = [ "In the following conversation, all the information point
                      ]
 
 
-def get_info_point_prompts(charaSet: CharaSetting):
+def get_info_point_prompts(charaSet: dict):
     result = []
 
     for i, prompt in enumerate(info_point_prompts):
@@ -35,31 +33,31 @@ def get_info_point_prompts(charaSet: CharaSetting):
         else:
             result.append({"role": "assistant", "content": prompt})
     
-    end = f"Ok, in this conversation I will perform as the imaginary character {charaSet.name} and only cover and list the necessary information points."
+    end = f"Ok, in this conversation I will perform as the imaginary character {charaSet['name']} and only cover and list the necessary information points."
 
     result.append({"role": "assistant", "content": end})
 
     return result
 
 
-def get_begin_prompts(charaSet: CharaSetting):
+def get_begin_prompts(charaSet: dict):
     return get_intro_prompts(charaSet) + get_info_point_prompts(charaSet)
 
 
-def get_tone_prompts(charaSet: CharaSetting, info_points: list):
-    begin = f"""Here is a conversation between an imagined character called '{charaSet.name}' and a human.
+def get_tone_prompts(charaSet: dict, info_points: list):
+    begin = f"""Here is a conversation between an imagined character called '{charaSet['name']}' and a human.
     
 This is the sayings of '{charaSet.name}':
     """
 
-    for saying in charaSet.sayings:
+    for saying in charaSet["sayings"]:
         begin += saying + '\n    '
     
-    info_prompt = f"These are the points {charaSet.name} wants to express in a daily conversation:\n"
+    info_prompt = f"These are the points {charaSet['name']} wants to express in a daily conversation:\n"
 
     for info_point in info_points:
         info_prompt += f"- {info_point}\n"
     
-    end = f"Here is how {charaSet.name} would express this in {charaSet.tone}'s tone."
+    end = f"Here is how {charaSet['name']} would express this in {charaSet['name']}'s tone."
 
     return begin + info_prompt + end
