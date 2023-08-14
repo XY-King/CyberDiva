@@ -15,7 +15,7 @@ Character sayings:
            , {"role": "assistant", "content": f"Ok, I am now going to perform as the imaginary character {charaSet.name}."}
            ]
 
-info_point_prompts = [ "In the following conversation, only the necessary information points should be covered and listed."
+info_point_prompts = [ "In the following conversation, all the information points you want to express should be in the form of a list."
                      , "Ok, let's make a sample conversation."
                      , "Would you like to have lunch with me?"
                      , "- I'd love to\n- Asking what to have for lunch"
