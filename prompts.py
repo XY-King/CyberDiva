@@ -52,7 +52,7 @@ This is the sayings of '{charaSet['name']}':
 
     for saying in charaSet["sayings"]:
         begin += saying + '\n    '
-    
+
     info_prompt = f"These are the points {charaSet['name']} wants to express in a daily conversation:\n"
     info_prompt += info_points + '\n'
     

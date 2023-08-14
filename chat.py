@@ -1,5 +1,6 @@
 import openai
 import string
+import os
 
 class Chat:
     def __init__(self, setting : dict):
@@ -21,3 +22,9 @@ class Chat:
         response_msg = {"role": "assistant",
                         "content": response.choices[0].text}
         self.history.append(response_msg)
+    
+    def print_history(self):
+        os.system("cls")
+        for i, msg in enumerate(self.history):
+            if i >= 8:
+                print(msg["role"] + ": " + msg["content"])
