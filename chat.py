@@ -1,4 +1,5 @@
 import openai
+import string
 
 
 class Chat:
@@ -6,7 +7,7 @@ class Chat:
         self.setting = setting
         self.history = []
 
-    def user_input(self, input):
+    def user_input(self, input: string):
         input_msg = {"role": "user", "content": input}
         self.history.append(input_msg)
 
