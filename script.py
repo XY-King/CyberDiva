@@ -7,11 +7,7 @@ openai.api_key = json.load(open("config.json"))["api_key"]
 
 
 def main():
-    name = "test"
-    sayings = ["happy", "lala"]
-    set = charaSetting(name, sayings)
-    prompt = begin_prompt(set)
-    print(prompt["content"])
+    pass
 
 
 if __name__ == "__main__":
