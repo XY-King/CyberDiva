@@ -1,8 +1,7 @@
 from setting import charaSetting
 
 def get_intro_prompts(charaSet: charaSetting):
-    begin = f"""
-You are now going to perform as an imaginary character。
+    begin = f"""You are now going to perform as an imaginary character.
 
 Character name: {charaSet.name}
 
@@ -35,6 +34,8 @@ def get_info_point_prompts(charaSet: charaSetting):
     end = f"Ok, in this conversation I will perform as the imaginary character {charaSet.name} and only cover and list the necessary information points."
 
     result.append({"role": "assistant", "content": end})
+
+    return result
 
 def get_begin_prompts(charaSet: charaSetting):
     return get_intro_prompts(charaSet) + get_info_point_prompts(charaSet)
