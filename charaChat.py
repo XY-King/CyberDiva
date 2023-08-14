@@ -1,5 +1,6 @@
 from chat import Chat
 from setting import charaSetting, chatSetting
+from prompts import get_begin_prompts
 
 
 class CharaChat(Chat):
@@ -9,4 +10,4 @@ class CharaChat(Chat):
         self.initMsg()
     
     def initMsg(self):
-        begin = f"You are now going to perform as an imaginary character\n\n"
+        self.history.append(get_begin_prompts(self.chara))
