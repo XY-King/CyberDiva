@@ -1,4 +1,4 @@
-
+import string
 
 def get_intro_prompts(charaSet: dict):
     begin = f"""You are now going to perform as an imaginary character.
@@ -44,19 +44,17 @@ def get_begin_prompts(charaSet: dict):
     return get_intro_prompts(charaSet) + get_info_point_prompts(charaSet)
 
 
-def get_tone_prompts(charaSet: dict, info_points: list):
+def get_tone_prompts(charaSet: dict, info_points: string):
     begin = f"""Here is a conversation between an imagined character called '{charaSet['name']}' and a human.
     
-This is the sayings of '{charaSet.name}':
+This is the sayings of '{charaSet['name']}':
     """
 
     for saying in charaSet["sayings"]:
         begin += saying + '\n    '
     
     info_prompt = f"These are the points {charaSet['name']} wants to express in a daily conversation:\n"
-
-    for info_point in info_points:
-        info_prompt += f"- {info_point}\n"
+    info_prompt += info_points + '\n'
     
     end = f"Here is how {charaSet['name']} would express this in {charaSet['name']}'s tone."
 
