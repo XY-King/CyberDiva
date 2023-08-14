@@ -11,6 +11,6 @@ Character sayings:
     """
 
     for saying in charaSet.sayings:
-        begin += saying + '\n   '
+        begin += saying + '\n    '
 
     return {"role": "user", "content": begin}
