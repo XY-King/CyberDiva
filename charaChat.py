@@ -11,7 +11,7 @@ class CharaChat(Chat):
     def initMsg(self):
         self.history = get_begin_prompts(self.chara)
     
-    def add_response(self):
+    def get_response(self):
         info_response = super().get_response()
 
         tone_response =openai.Completion.create(
@@ -21,6 +21,13 @@ class CharaChat(Chat):
             temperature=self.setting["temperature"],
         )
 
-        super().add_response(tone_response["choices"][0]["text"])
+        tone_text = tone_response["choices"][0]["text"]
+        # delete the \n at the beginning of the response
+        for i in range(len(tone_text)):
+            if tone_text[i] != "\n":
+                tone_text = tone_text[i:]
+                break
+
+        return tone_text
 
 

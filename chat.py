@@ -19,11 +19,11 @@ class Chat:
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
         )
-        return response.choices[0].text
+        return response.choices[0]["message"]["content"]
     
     def add_response(self, response: string):
         response_msg = {"role": "assistant",
-                        "content": response.choices[0].text}
+                        "content": response}
         self.history.append(response_msg)
     
     def print_history(self):

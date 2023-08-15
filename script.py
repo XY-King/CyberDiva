@@ -12,7 +12,7 @@ def main():
             break
         else:
             core.user_input(user_input)
-            core.get_response()
+            core.add_response(core.get_response())
 
 
 if __name__ == "__main__":
