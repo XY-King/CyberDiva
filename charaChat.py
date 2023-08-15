@@ -11,25 +11,16 @@ class CharaChat(Chat):
     def initMsg(self):
         self.history = get_begin_prompts(self.chara)
     
-    # override the get_response method
-    def get_response(self):
-        openai.api_key = self.setting["api_key"]
-        response = openai.ChatCompletion.create(
-            model=self.setting["model"],
-            messages=self.history,
-            max_tokens=self.setting["max_tokens"],
-            temperature=self.setting["temperature"],
-        )
+    def add_response(self):
+        info_response = super().get_response()
 
         tone_response =openai.Completion.create(
             model="text-davinci-003",
-            prompt=get_tone_prompts(self.chara, response.choices[0]["message"]["content"]),
+            prompt=get_tone_prompts(self.chara, info_response),
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
         )
 
-        response_msg = {"role": "assistant",
-                        "content": tone_response.choices[0]["text"]}
-        self.history.append(response_msg)
+        super().add_response(tone_response["choices"][0]["text"])
 
 
