@@ -15,7 +15,7 @@ class Chat:
         openai.api_key = self.setting["api_key"]
         response = openai.ChatCompletion.create(
             model=self.setting["model"],
-            messages=self.history,
+            messages=[self.setting["sys_msg"]] + self.history,
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
         )

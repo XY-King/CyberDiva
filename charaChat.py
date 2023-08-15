@@ -1,6 +1,7 @@
 from chat import Chat
 from prompts import get_begin_prompts, get_tone_prompts
 import openai
+import os
 
 class CharaChat(Chat):
     def __init__(self, charaSet: dict, chatSet: dict):
@@ -26,10 +27,20 @@ class CharaChat(Chat):
         tone_text = tone_response["choices"][0]["text"]
         # delete the \n at the beginning of the response
         for i in range(len(tone_text)):
-            if tone_text[i] != "\n":
+            if tone_text[i] != "\n" and tone_text[i] != " ":
                 tone_text = tone_text[i:]
                 break
 
         return tone_text
+
+    def print_history(self):
+        os.system("cls")
+        for i, msg in enumerate(self.history):
+            if i >= 8:
+                if msg["role"] == "user":
+                    print("You: " + msg["content"])
+                else:
+                    print(self.chara["name"] + ": " + msg["content"])
+
 
 
