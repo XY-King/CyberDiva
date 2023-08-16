@@ -1,8 +1,15 @@
 import json
 from charaChat import CharaChat
+import os
 
 def main():
-    chatSet = json.load(open("config.json", "rb"))
+    config_id = get_config_id()
+    chatSet = json.load(open(config_id, "rb"))
+
+    if chatSet["api_key"] == "YOUR_API_KEY":
+        print("Please set your API key in config.json")
+        return
+
     charaSet = json.load(open("chara.json", "rb"))
     core = CharaChat(chatSet=chatSet, charaSet=charaSet)
     while True:
@@ -17,3 +24,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def get_config_id():
+    if os.path.exists("my_config.json"):
+        return "my_config.json"
+    else:
+        return "config.json"
