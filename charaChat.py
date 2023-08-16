@@ -14,6 +14,9 @@ class CharaChat(Chat):
     def initMsg(self):
         self.history = get_begin_prompts(self.chara)
     
+    def user_input(self, input: string):
+        super().user_input(input)
+        self.final_history.append({"role": "user", "content": input})
 
     def add_response(self, response: string):
         tone_response =openai.Completion.create(
