@@ -2,6 +2,12 @@ import json
 from charaChat import CharaChat
 import os
 
+def get_config_id():
+    if os.path.exists("my_config.json"):
+        return "my_config.json"
+    else:
+        return "config.json"
+
 def main():
     config_id = get_config_id()
     chatSet = json.load(open(config_id, "rb"))
@@ -24,9 +30,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-def get_config_id():
-    if os.path.exists("my_config.json"):
-        return "my_config.json"
-    else:
-        return "config.json"
