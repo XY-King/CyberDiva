@@ -14,6 +14,7 @@ class CharaChat(Chat):
     def initMsg(self):
         self.history = get_begin_prompts(self.chara)
     
+
     def add_response(self, response: string):
         tone_response =openai.Completion.create(
             model="text-davinci-003",
@@ -37,12 +38,11 @@ class CharaChat(Chat):
 
     def print_history(self):
         os.system("cls")
-        for i, msg in enumerate(self.history):
-            if i >= 8:
-                if msg["role"] == "user":
-                    print("You: " + msg["content"])
-                else:
-                    print(self.chara["name"] + ": " + msg["content"])
+        for i, msg in enumerate(self.final_history):
+            if msg["role"] == "user":
+                print("You: " + msg["content"])
+            else:
+                print(self.chara["name"] + ": " + msg["content"])
 
 
 
