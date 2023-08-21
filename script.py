@@ -17,7 +17,8 @@ def main():
         return
 
     charaSet = json.load(open("chara.json", "rb"))
-    core = CharaChat(chatSet=chatSet, charaSet=charaSet)
+    userSet = json.load(open("user.json", "rb"))
+    core = CharaChat(chatSet=chatSet, charaSet=charaSet, userSet=userSet)
     while True:
         core.print_history()
         user_input = input(">>> ")
@@ -25,7 +26,7 @@ def main():
             break
         elif user_input == "debug":
             print(core.history)
-            print(core.final_history)
+            print(core.real_history)
             input()
         else:
             core.user_input(user_input)
