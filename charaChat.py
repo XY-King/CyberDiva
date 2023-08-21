@@ -1,6 +1,6 @@
 import string
 from chat import Chat
-from prompts import get_begin_prompts, get_tone_prompts
+from prompts import get_begin_prompts, get_tone_prompts, filter_sayings
 import openai
 import os
 
@@ -10,9 +10,22 @@ class CharaChat(Chat):
         self.chara = charaSet
         self.user = userSet
         self.real_history = []
+        self.filtered_setting = []
     
+    def get_filtered_setting(self, input: string):
+        filtered_saying = filter_sayings(
+            sayings=self.charaSet["sayings"], input=input, api_key=self.setting["api_key"], num=10
+        )
+        filtered_story = filter_sayings(
+            sayings=self.charaSet["story"], input=input, api_key=self.setting["api_key"], num=3
+        )
+
+        self.filtered_setting = {"sayings": filtered_saying, "story": filtered_story}
+
     def user_input(self, input: string):
-        init_msg = get_begin_prompts(charaSet=self.chara, userSet=self.user, input=input, api_key=self.setting["api_key"])
+        self.get_filtered_setting(input)
+
+        init_msg = get_begin_prompts(charaSet=self.chara, userSet=self.user, filtered_setting=self.filtered_setting)
         named_input = self.user["name"] + ": \n" + input
 
         if self.history == []:

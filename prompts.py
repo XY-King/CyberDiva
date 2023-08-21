@@ -18,14 +18,7 @@ def filter_sayings(sayings: list, input: string, api_key: string, num: int):
     return sayings_relation
 
 
-def get_intro_prompts(charaSet: dict, userSet: dict, input: string, api_key: string):
-    filtered_saying = filter_sayings(
-        sayings=charaSet["sayings"], input=input, api_key=api_key, num=10
-    )
-    filtered_story = filter_sayings(
-        sayings=charaSet["story"], input=input, api_key=api_key, num=3
-    )
-
+def get_intro_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
     chara = f"""I am now writing a story about the relationship and daily conversation between two imaginary characters.
 
 The first imaginary character is as follows:
@@ -35,11 +28,11 @@ Character name: {charaSet["name"]}
 Character sayings: 
     """
 
-    for saying in filtered_saying:
+    for saying in filtered_setting["sayings"]:
         chara += saying["content"] + "\n    "
     chara = chara[:-4]
     chara += "Character story:\n    "
-    for story in filtered_story:
+    for story in filtered_setting["story"]:
         chara += story["content"] + "\n    "
 
     user = f"""The second imaginary character is as follows:
@@ -88,16 +81,18 @@ def get_info_point_prompts(charaSet: dict, userSet: dict):
     return result
 
 
-def get_begin_prompts(charaSet: dict, userSet: dict, input: string, api_key: string):
+def get_begin_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
     return get_intro_prompts(
-        charaSet=charaSet, userSet=userSet, input=input, api_key=api_key
+        charaSet=charaSet, userSet=userSet, filtered_setting=filtered_setting
     ) + get_info_point_prompts(charaSet=charaSet, userSet=userSet)
 
 
 def get_tone_prompts(charaSet: dict, history: list, info_points: string):
-    begin = f"""Here is a conversation between an imagined character called '{charaSet['name']}' and a human.
+    begin = f"""There are two imaginary characters:
     
-This is the sayings of '{charaSet['name']}':
+The first character is {charaSet['name']}.
+
+Sayings of {charaSet['name']}:
     """
 
     for saying in charaSet["sayings"]:
