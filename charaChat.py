@@ -10,13 +10,17 @@ class CharaChat(Chat):
         self.chara = charaSet
         self.user = userSet
         self.real_history = []
-        self.initMsg()
-    
-    def initMsg(self):
-        self.history = get_begin_prompts(charaSet=self.chara, userSet=self.user)
     
     def user_input(self, input: string):
+        init_msg = get_begin_prompts(charaSet=self.chara, userSet=self.user, input=input, api_key=self.setting["api_key"])
         named_input = self.user["name"] + ": \n" + input
+
+        if self.history == []:
+            for msg in init_msg:
+                self.history.append(msg)
+        else:
+            for i, msg in enumerate(init_msg):
+                self.history[i] = msg
         super().user_input(named_input)
         self.real_history.append({"role": "user", "content": input})
 
