@@ -1,7 +1,9 @@
 import string
 
-def get_intro_prompts(charaSet: dict):
-    begin = f"""You are now going to perform as an imaginary character.
+def get_intro_prompts(charaSet: dict, userSet: dict):
+    chara = f"""I am now writing a story about the relationship and daily conversation between two imaginary characters.
+
+The first imaginary character is as follows:
 
 Character name: {charaSet["name"]}
 
@@ -9,10 +11,20 @@ Character sayings:
     """
 
     for saying in charaSet["sayings"]:
-        begin += saying + '\n    '
+        chara += saying + '\n    '
 
-    return [ {"role": "user", "content": begin}
-           , {"role": "assistant", "content": f"Ok, I am now going to perform as the imaginary character {charaSet['name']}."}
+    user = f"""The second imaginary character is as follows:
+
+Character name: {userSet["name"]}
+
+Character setting: {userSet["setting"]}
+
+I will input what {userSet["name"]} says in the story, and you shall output the response of Klee in the story."""
+
+    return [ {"role": "user", "content": chara}
+           , {"role": "assistant", "content": f"Ok, I have fully understood the character and traits of the imaginary character {charaSet['name']}."}
+           , {"role": "assistant", "content": user}
+           , {"role": "assistant", "content": f"Ok, I am now going to help you write the story by simulating the response of the imaginary character {charaSet['name']}."}
            ]
 
 
@@ -44,7 +56,7 @@ def get_begin_prompts(charaSet: dict):
     return get_intro_prompts(charaSet) + get_info_point_prompts(charaSet)
 
 
-def get_tone_prompts(charaSet: dict, input_sentence:string, info_points: string):
+def get_tone_prompts(charaSet: dict, history: list, info_points: string):
     begin = f"""Here is a conversation between an imagined character called '{charaSet['name']}' and a human.
     
 This is the sayings of '{charaSet['name']}':
@@ -55,10 +67,19 @@ This is the sayings of '{charaSet['name']}':
 
     begin += "The following is in a daily conversation:\n"
 
-    input_prompt = f"This is the sentence {charaSet['name']} wants to respond to:\n"
-    input_prompt += input_sentence + '\n'
+    input_prompt = f"This is the conversation history:\n"
+    if len(history) == 0:
+        input_prompt += "No history yet.\n"
+    else:
+        for msg in history:
+            if msg["role"] == "user":
+                role = "Human"
+            else:
+                role = charaSet["name"]
+            sentence = msg["content"]
+            input_prompt += (role + ": " + sentence + '\n')
 
-    info_prompt = f"These are the points {charaSet['name']} wants to express:\n"
+    info_prompt = f"These are the points {charaSet['name']} wants to response to the human:\n"
     info_prompt += info_points + '\n'
     
     end = f"Here is how {charaSet['name']} would express this in {charaSet['name']}'s tone."

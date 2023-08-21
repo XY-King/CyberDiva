@@ -22,7 +22,7 @@ class CharaChat(Chat):
         tone_response =openai.Completion.create(
             model="text-davinci-003",
             prompt=get_tone_prompts(charaSet=self.chara, 
-                                    input_sentence=self.history[-1]["content"], 
+                                    history=self.final_history,
                                     info_points=response),
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],

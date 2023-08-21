@@ -23,6 +23,10 @@ def main():
         user_input = input(">>> ")
         if user_input == "exit":
             break
+        elif user_input == "debug":
+            print(core.history)
+            print(core.final_history)
+            input()
         else:
             core.user_input(user_input)
             core.add_response(core.get_response())
