@@ -18,7 +18,10 @@ def filter_sayings(sayings: list, input: string, api_key: string, num: int):
     return sayings_relation
 
 
-def get_intro_prompts(charaSet: dict, userSet: dict):
+def get_intro_prompts(charaSet: dict, userSet: dict, input: string, api_key: string):
+    filtered_saying = filter_sayings(sayings=charaSet["sayings"], input=input, api_key=api_key, num=10)
+    filtered_story = filter_sayings(sayings=charaSet["story"], input=input, api_key=api_key, num=3)
+
     chara = f"""I am now writing a story about the relationship and daily conversation between two imaginary characters.
 
 The first imaginary character is as follows:
@@ -28,8 +31,12 @@ Character name: {charaSet["name"]}
 Character sayings: 
     """
 
-    for saying in charaSet["sayings"]:
+    for saying in filtered_saying:
         chara += saying["content"] + '\n    '
+    chara = chara[:-4]
+    chara += "Character story:\n    "
+    for story in filtered_story:
+        chara += story["content"] + '\n    '
 
     user = f"""The second imaginary character is as follows:
 
