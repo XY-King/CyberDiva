@@ -87,36 +87,43 @@ def get_begin_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
     ) + get_info_point_prompts(charaSet=charaSet, userSet=userSet)
 
 
-def get_tone_prompts(charaSet: dict, history: list, info_points: string):
-    begin = f"""There are two imaginary characters:
+def get_tone_prompts(charaSet: dict, userSet: dict, history: list, info_points: string, filtered_setting: dict):
+    chara = f"""There are two imaginary characters:
     
 The first character is {charaSet['name']}.
 
 Sayings of {charaSet['name']}:
     """
 
-    for saying in charaSet["sayings"]:
-        begin += saying["content"] + "\n    "
+    for saying in filtered_setting["sayings"]:
+        chara += saying["content"] + "\n    "
+    
+    chara = chara[:-4]
+    chara += "Story of " + charaSet["name"] + ":\n    "
 
-    begin += "The following is in a daily conversation:\n"
+    for story in filtered_setting["story"]:
+        chara += story["content"] + "\n    "
 
-    input_prompt = f"This is the conversation history:\n"
-    if len(history) == 0:
-        input_prompt += "No history yet.\n"
-    else:
-        for msg in history:
-            if msg["role"] == "user":
-                role = "Human"
-            else:
-                role = charaSet["name"]
-            sentence = msg["content"]
-            input_prompt += role + ": " + sentence + "\n"
+    chara = chara[:-4] + "\n"
+    
+    user = f"""The second character is {userSet['name']}.
+Character setting of {userSet['name']}:
+    """
+    user += userSet["setting"] + "\n"
 
-    info_prompt = (
-        f"These are the points {charaSet['name']} wants to response to the human:\n"
-    )
-    info_prompt += info_points + "\n"
+    chara += "The following is in a daily conversation:\n"
 
-    end = f"Here is how {charaSet['name']} would express this in {charaSet['name']}'s tone."
+    conversation = f"The following is a story about a daily conversation between {charaSet['name']} and {userSet['name']}:\n"
 
-    return begin + info_prompt + end
+    conversation += f"""This is what {userSet['name']} says:\n
+{history[-1]['content']}
+
+These are the information points {charaSet['name']} want to express in {charaSet['name']}'s response:
+{info_points}
+"""
+
+    conversation += f"""Here is how {charaSet['name']} would express these points in {charaSet['name']}'s tone:
+"    
+"""
+
+    return chara + user + conversation
