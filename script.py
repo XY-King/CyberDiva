@@ -1,5 +1,6 @@
 import json
 from charaChat import CharaChat
+from read import get_chara_config
 import os
 
 def get_config_id():
@@ -16,7 +17,7 @@ def main():
         print("Please set your API key in config.json")
         return
 
-    charaSet = json.load(open("chara.json", "rb"))
+    charaSet = get_chara_config(chatSet["api_key"])
     userSet = json.load(open("user.json", "rb"))
     core = CharaChat(chatSet=chatSet, charaSet=charaSet, userSet=userSet)
     while True:

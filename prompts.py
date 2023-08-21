@@ -11,7 +11,7 @@ Character sayings:
     """
 
     for saying in charaSet["sayings"]:
-        chara += saying + '\n    '
+        chara += saying["content"] + '\n    '
 
     user = f"""The second imaginary character is as follows:
 
@@ -62,7 +62,7 @@ This is the sayings of '{charaSet['name']}':
     """
 
     for saying in charaSet["sayings"]:
-        begin += saying + '\n    '
+        begin += saying["content"] + '\n    '
 
     begin += "The following is in a daily conversation:\n"
 
