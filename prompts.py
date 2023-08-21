@@ -28,16 +28,15 @@ I will input what {userSet["name"]} says in the story, and you shall output the 
            ]
 
 
-info_point_prompts = [ "In the following conversation, all the information points you want to express should be in the form of a list."
-                     , "Ok, let's make a sample conversation."
-                     , "Would you like to have lunch with me?"
-                     , "- I'd love to\n- Asking what to have for lunch"
-                     , "Ok, let's now begin a real conversation."
-                     ]
-
-
-def get_info_point_prompts(charaSet: dict):
+def get_info_point_prompts(charaSet: dict, userSet: dict):
     result = []
+
+    info_point_prompts = [ f"To help me write the story,  you should output the information points in the response of {charaSet['name']} in the form of a list."
+                        , "Ok, let's make a sample conversation."
+                        , f"{userSet['name']}: Would you like to have lunch with me?"
+                        , f"{charaSet['name']}: \n- I'd love to\n- Asking what to have for lunch"
+                        , "Ok, let's now begin a story."
+                        ]
 
     for i, prompt in enumerate(info_point_prompts):
         if i % 2 == 0:
@@ -45,15 +44,15 @@ def get_info_point_prompts(charaSet: dict):
         else:
             result.append({"role": "assistant", "content": prompt})
     
-    end = f"Ok, in this conversation I will perform as the imaginary character {charaSet['name']} and only cover and list the necessary information points."
+    end = f"Ok, in the story I will simulate the response of the imaginary character {charaSet['name']} and output the information points in the form of a list."
 
     result.append({"role": "assistant", "content": end})
 
     return result
 
 
-def get_begin_prompts(charaSet: dict):
-    return get_intro_prompts(charaSet) + get_info_point_prompts(charaSet)
+def get_begin_prompts(charaSet: dict, userSet: dict):
+    return get_intro_prompts(charaSet = charaSet, userSet = userSet) + get_info_point_prompts(charaSet = charaSet, userSet = userSet)
 
 
 def get_tone_prompts(charaSet: dict, history: list, info_points: string):
