@@ -25,12 +25,12 @@ def embed_chara(name: string, api_key: string):
     # make the json file of the character with the embeddings
     sayings_embedded = []
     for i in range(len(charaInit["sayings"])):
-        embedding = saying_embeddings[i]["embedding"]
+        embedding = saying_embeddings[i]
         sayings_embedded.append({"content": charaInit["sayings"][i], "embedding": embedding})
     
     story_embedded = []
     for i in range(len(charaInit["story"])):
-        embedding = story_embeddings[i]["embedding"]
+        embedding = story_embeddings[i]
         story_embedded.append({"content": charaInit["story"][i], "embedding": embedding})
 
     # change the "is_embedded" to True

@@ -115,7 +115,7 @@ Character setting of {userSet['name']}:
 
     conversation = f"The following is a story about a daily conversation between {charaSet['name']} and {userSet['name']}:\n"
 
-    conversation += f"""This is what {userSet['name']} says:\n
+    conversation += f"""This is what {userSet['name']} express:\n
 {history[-1]['content']}
 
 These are the information points {charaSet['name']} want to express in {charaSet['name']}'s response:
