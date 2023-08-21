@@ -1,4 +1,22 @@
 import string
+import openai
+from openai.embeddings_utils import get_embedding, cosine_similarity
+
+# filter the sayings by the relation with the input and return the top {num} sayings
+def filter_sayings(sayings: list, input: string, api_key: string, num: int):
+    openai.api_key = api_key
+    input_embedding = get_embedding(text=input, engine="text-embedding-ada-002")
+    sayings_relation = []
+    for saying in sayings:
+        relation = cosine_similarity(input_embedding, saying["embedding"])
+        sayings_relation.append({"content": saying["content"], "relation": relation})
+
+    # sort the sayings by the relation from the highest to the lowest
+    sayings_relation.sort(key=lambda x: x["relation"], reverse=True)
+    # get the first {num} sayings
+    sayings_relation = sayings_relation[:num]
+    return sayings_relation
+
 
 def get_intro_prompts(charaSet: dict, userSet: dict):
     chara = f"""I am now writing a story about the relationship and daily conversation between two imaginary characters.
