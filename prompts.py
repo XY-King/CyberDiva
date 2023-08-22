@@ -5,7 +5,7 @@ from openai.embeddings_utils import get_embedding, cosine_similarity
 # HELPER FUNCTIONS
 
 # filter the sayings by the relation with the input and return the top {num} sayings
-def filter_sayings(sayings: list, input: string, api_key: string, num: int):
+def filter_sayings(sayings: list, input: string, api_key: string, num: int, is_stable: bool = False):
     openai.api_key = api_key
     input_embedding = get_embedding(text=input, engine="text-embedding-ada-002")
     sayings_relation = []
@@ -13,10 +13,21 @@ def filter_sayings(sayings: list, input: string, api_key: string, num: int):
         relation = cosine_similarity(input_embedding, saying["embedding"])
         sayings_relation.append({"content": saying["content"], "relation": relation})
 
-    # sort the sayings by the relation from the highest to the lowest
-    sayings_relation.sort(key=lambda x: x["relation"], reverse=True)
-    # get the first {num} sayings
-    sayings_relation = sayings_relation[:num]
+    if not is_stable:
+        # sort the sayings by the relation from the highest to the lowest
+        sayings_relation.sort(key=lambda x: x["relation"], reverse=True)
+        # get the first {num} sayings
+        sayings_relation = sayings_relation[:num]
+    else:
+        # keep the sayings order and return the sayings with top {num} relations
+        sayings_relation_copy = sayings_relation.copy()
+        sayings_relation_copy.sort(key=lambda x: x["relation"], reverse=True)
+        sayings_relation_copy = sayings_relation_copy[:num]
+        for i, saying in enumerate(sayings_relation):
+            if not saying in sayings_relation_copy:
+                sayings_relation[i] = None
+        sayings_relation = list(filter(lambda x: x != None, sayings_relation))
+    
     return sayings_relation
 
 # combine a list of sayings with embeddings into one string
@@ -28,6 +39,16 @@ def combine_sayings(sayings: list):
         else:
             result += saying["content"] + "\n    "
     return result
+
+# name a msg with embedding
+def name_embedded_msg(charaSet: dict, userSet: dict, msg: dict):
+    if msg["content"]["role"] == "user":
+        nContent = userSet["name"] + ": " + msg["content"]["content"]
+    else:
+        nContent = charaSet["name"] + ": " + msg["content"]["content"]
+    
+    return {"content": nContent, "embedding": msg["embedding"]}
+
 
 # PROMPTS FUNCTIONS
 
@@ -106,6 +127,12 @@ def get_tone_prompts(charaSet: dict, userSet: dict, history: list, info_points: 
     # preperation
     sayings = combine_sayings(filtered_setting["sayings"])
     story = combine_sayings(filtered_setting["story"])
+    history_copy = history.copy()
+    history_copy.pop()
+    named_history = [name_embedded_msg(charaSet=charaSet, userSet=userSet, msg=msg) for msg in history_copy]
+    filtered_history = filter_sayings(sayings=named_history, input=info_points, api_key=api_key, num=40, is_stable=True)
+    done_history = combine_sayings(filtered_history)
+    print (done_history)
 
     # prompts
     result = f"""There are two imaginary characters:
@@ -123,6 +150,8 @@ Character setting of {userSet['name']}:
 {userSet['setting']}
 
 The following is a story about a daily conversation between {charaSet['name']} and {userSet['name']}:
+
+{done_history}
 
 This is what {userSet['name']} express:\n
 {history[-1]['content']}

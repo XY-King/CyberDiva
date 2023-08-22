@@ -1,7 +1,7 @@
 import json
 import string
 import openai
-from openai.embeddings_utils import get_embeddings
+from openai.embeddings_utils import get_embeddings, get_embedding
 
 def get_chara_config(api_key: string):
     name = json.load(open("chara.json", "rb"))["name"]

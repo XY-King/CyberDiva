@@ -2,6 +2,7 @@ import string
 from chat import Chat
 from prompts import get_begin_prompts, get_tone_prompts, filter_sayings
 import openai
+from openai.embeddings_utils import get_embedding
 import os
 
 class CharaChat(Chat):
@@ -35,7 +36,8 @@ class CharaChat(Chat):
             for i, msg in enumerate(init_msg):
                 self.history[i] = msg
         super().user_input(named_input)
-        self.real_history.append({"role": "user", "content": input})
+
+        self.real_history.append(with_embedding(self.history[-1], self.setting["api_key"]))
 
     def add_response(self, response: string):
         tone_response =openai.Completion.create(
@@ -44,7 +46,8 @@ class CharaChat(Chat):
                                     userSet=self.user,
                                     history=self.real_history,
                                     info_points=response, 
-                                    filtered_setting=self.filtered_setting),
+                                    filtered_setting=self.filtered_setting, 
+                                    api_key=self.setting["api_key"]),
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
         )
@@ -57,16 +60,25 @@ class CharaChat(Chat):
                 break
         
         self.history.append({"role": "assistant", "content": response})
-        self.real_history.append({"role": "assistant", "content": tone_text})
+        self.real_history.append(with_embedding(self.history[-1], self.setting["api_key"]))
         
 
     def print_history(self):
         os.system("cls")
-        for i, msg in enumerate(self.real_history):
+        for _msg in self.real_history:
+            msg = _msg["content"]
             if msg["role"] == "user":
                 print("You: " + msg["content"])
             else:
                 print(self.chara["name"] + ": " + msg["content"])
+
+# HELPER FUNCTIONS
+
+def with_embedding(msg: dict, api_key: string):
+    openai.api_key = api_key
+    embedding = get_embedding(text=msg["content"], engine="text-embedding-ada-002")
+    return {"content": msg, "embedding": embedding}
+
 
 
 
