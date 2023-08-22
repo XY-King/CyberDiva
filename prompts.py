@@ -2,6 +2,8 @@ import string
 import openai
 from openai.embeddings_utils import get_embedding, cosine_similarity
 
+# HELPER FUNCTIONS
+
 # filter the sayings by the relation with the input and return the top {num} sayings
 def filter_sayings(sayings: list, input: string, api_key: string, num: int):
     openai.api_key = api_key
@@ -17,8 +19,24 @@ def filter_sayings(sayings: list, input: string, api_key: string, num: int):
     sayings_relation = sayings_relation[:num]
     return sayings_relation
 
+# combine a list of sayings with embeddings into one string
+def combine_sayings(sayings: list):
+    result = "    "
+    for i, saying in enumerate(sayings):
+        if i == len(sayings) - 1:
+            result += saying["content"] + "\n"
+        else:
+            result += saying["content"] + "\n    "
+    return result
+
+# PROMPTS FUNCTIONS
 
 def get_intro_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
+    # preperation
+    sayings = combine_sayings(filtered_setting["sayings"])
+    story = combine_sayings(filtered_setting["story"])
+
+    # prompts
     chara = f"""I am now writing a story about the relationship and daily conversation between two imaginary characters.
 
 The first imaginary character is as follows:
@@ -26,14 +44,11 @@ The first imaginary character is as follows:
 Character name: {charaSet["name"]}
 
 Character sayings: 
-    """
+{sayings}
 
-    for saying in filtered_setting["sayings"]:
-        chara += saying["content"] + "\n    "
-    chara = chara[:-4]
-    chara += "Character story:\n    "
-    for story in filtered_setting["story"]:
-        chara += story["content"] + "\n    "
+Character story:
+{story}
+    """
 
     user = f"""The second imaginary character is as follows:
 
@@ -87,43 +102,36 @@ def get_begin_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
     ) + get_info_point_prompts(charaSet=charaSet, userSet=userSet)
 
 
-def get_tone_prompts(charaSet: dict, userSet: dict, history: list, info_points: string, filtered_setting: dict):
-    chara = f"""There are two imaginary characters:
+def get_tone_prompts(charaSet: dict, userSet: dict, history: list, info_points: string, filtered_setting: dict, api_key: string):
+    # preperation
+    sayings = combine_sayings(filtered_setting["sayings"])
+    story = combine_sayings(filtered_setting["story"])
+
+    # prompts
+    result = f"""There are two imaginary characters:
     
 The first character is {charaSet['name']}.
 
 Sayings of {charaSet['name']}:
-    """
+{sayings}
 
-    for saying in filtered_setting["sayings"]:
-        chara += saying["content"] + "\n    "
-    
-    chara = chara[:-4]
-    chara += "Story of " + charaSet["name"] + ":\n    "
+Story of {charaSet['name']}:
+{story}
 
-    for story in filtered_setting["story"]:
-        chara += story["content"] + "\n    "
-
-    chara = chara[:-4] + "\n"
-    
-    user = f"""The second character is {userSet['name']}.
+The second character is {userSet['name']}.
 Character setting of {userSet['name']}:
-    """
-    user += userSet["setting"] + "\n"
+{userSet['setting']}
 
-    chara += "The following is in a daily conversation:\n"
+The following is a story about a daily conversation between {charaSet['name']} and {userSet['name']}:
 
-    conversation = f"The following is a story about a daily conversation between {charaSet['name']} and {userSet['name']}:\n"
-
-    conversation += f"""This is what {userSet['name']} express:\n
+This is what {userSet['name']} express:\n
 {history[-1]['content']}
 
 These are the information points {charaSet['name']} want to express in {charaSet['name']}'s response:
 {info_points}
-"""
 
-    conversation += f"""Here is how {charaSet['name']} would express these points in {charaSet['name']}'s tone:
+Here is how {charaSet['name']} would express these points in {charaSet['name']}'s tone:
 "    
 """
 
-    return chara + user + conversation
+    return result
