@@ -19,13 +19,13 @@ class CharaChat(Chat):
             sayings=self.chara["sayings"],
             input=input,
             api_key=self.setting["api_key"],
-            num=40,
+            num=20,
         )
         filtered_story = filter_sayings(
             sayings=self.chara["story"],
             input=input,
             api_key=self.setting["api_key"],
-            num=3,
+            num=2,
         )
 
         self.filtered_setting = {"sayings": filtered_saying, "story": filtered_story}

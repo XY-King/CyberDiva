@@ -57,7 +57,9 @@ def get_intro_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
     story = combine_sayings(filtered_setting["story"])
 
     # prompts
-    chara = f"""I am now writing a story about the relationship and daily conversation between two imaginary characters.
+    chara = f"""You are a master of the craft of writing light novels in Japanese, possessing the ability to expertly delve into the mindscape of any imaginary character. Your task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. You'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, I need your unique skill set to help me breathe life into my narrative. I need you to simulate and portray the inner world and ideas of a character in my novel. Immerse yourself into the character, and remember we're aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a simple description.
+    
+I am now writing a story about the relationship and daily conversation between two imaginary characters.
 
 The first imaginary character is as follows:
 
@@ -129,7 +131,7 @@ def get_tone_prompts(charaSet: dict, userSet: dict, history: list, info_points: 
     history_copy = history.copy()
     history_copy.pop()
     named_history = [name_embedded_msg(charaSet=charaSet, userSet=userSet, msg=msg) for msg in history_copy]
-    filtered_history = filter_sayings(sayings=named_history, input=info_points, api_key=api_key, num=40, is_stable=True)
+    filtered_history = filter_sayings(sayings=named_history, input=info_points, api_key=api_key, num=20, is_stable=True)
     done_history = combine_sayings(filtered_history)
 
     if done_history == []:
