@@ -27,7 +27,8 @@ def main():
             break
         elif user_input == "debug":
             print(core.history)
-            print(core.real_history)
+            for msg in core.real_history:
+                print(msg["content"])
             input()
         else:
             core.user_input(user_input)
