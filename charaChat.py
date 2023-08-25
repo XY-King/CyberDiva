@@ -27,7 +27,7 @@ class CharaChat(Chat):
         self.get_filtered_setting(input)
 
         init_msg = get_begin_prompts(charaSet=self.chara, userSet=self.user, filtered_setting=self.filtered_setting)
-        named_input = self.user["name"] + ": \n" + input
+        named_input = self.user["name"] + ": " + input
 
         if self.history == []:
             for msg in init_msg:
@@ -36,8 +36,7 @@ class CharaChat(Chat):
             for i, msg in enumerate(init_msg):
                 self.history[i] = msg
         super().user_input(named_input)
-
-        self.real_history.append(with_embedding(self.history[-1], self.setting["api_key"]))
+        self.real_history.append(with_embedding({"role": "user", "content": input}, self.setting["api_key"]))
 
     def add_response(self, response: string):
         tone_response =openai.Completion.create(
@@ -60,7 +59,7 @@ class CharaChat(Chat):
                 break
         
         self.history.append({"role": "assistant", "content": response})
-        self.real_history.append(with_embedding(self.history[-1], self.setting["api_key"]))
+        self.real_history.append(with_embedding({"role": "assistant", "content": tone_text}, self.setting["api_key"]))
         
 
     def print_history(self):

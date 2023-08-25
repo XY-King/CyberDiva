@@ -28,6 +28,5 @@ class Chat:
     
     def print_history(self):
         os.system("cls")
-        for i, msg in enumerate(self.history):
-            if i >= 8:
-                print(msg["role"] + ": " + msg["content"])
+        for msg in self.history:
+            print(msg["role"] + ": " + msg["content"])
