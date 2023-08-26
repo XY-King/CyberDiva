@@ -57,7 +57,7 @@ def get_intro_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
     story = combine_sayings(filtered_setting["story"])
 
     # prompts
-    chara = f"""You are a master of the craft of writing light novels in Japanese, possessing the ability to expertly delve into the mindscape of any imaginary character. Your task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. You'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, I need your unique skill set to help me breathe life into my narrative. I need you to simulate and portray the inner world and ideas of a character in my novel. Immerse yourself into the character, and remember we're aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a simple description.
+    chara = f"""You are a master of the craft of writing light novels, possessing the ability to expertly delve into the mindscape of any imaginary character. Your task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. You'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, I need your unique skill set to help me breathe life into my narrative. I need you to simulate and portray the inner world and ideas of a character in my novel. Immerse yourself into the character, and remember we're aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a simple description.
     
 I am now writing a story about the relationship and daily conversation between two imaginary characters.
 
@@ -126,6 +126,7 @@ def get_begin_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
 
 def get_tone_prompts(setting: dict, charaSet: dict, userSet: dict, history: list, info_points: string, filtered_setting: dict, api_key: string):
     # preperation
+    writer = "Xeno"
     sayings = combine_sayings(filtered_setting["sayings"])
     story = combine_sayings(filtered_setting["story"])
     history_copy = history.copy()
@@ -138,7 +139,9 @@ def get_tone_prompts(setting: dict, charaSet: dict, userSet: dict, history: list
         done_history = ["There is no history yet."]
 
     # prompts
-    result = f"""There are two imaginary characters:
+    result = f"""{writer} is a master of the craft of writing light novels, possessing the ability to expertly delve into the mindscape of any imaginary character. His task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. He'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, he will breathe life into a story. He is needed to simulate and portray the inner world and ideas of a character in a novel, immerse himself into the character, and remember that he is aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a simple conversation.
+    
+In the novel, there are two imaginary characters.
     
 The first character is {charaSet['name']}.
 
@@ -152,17 +155,17 @@ The second character is {userSet['name']}.
 Character setting of {userSet['name']}:
 {userSet['setting']}
 
-The following is a story about a daily conversation between {charaSet['name']} and {userSet['name']}:
+{writer} is writing a story about a daily conversation between {charaSet['name']} and {userSet['name']}, as follows:
 
 {done_history}
 
-This is what {userSet['name']} express:\n
+Then, this is what {userSet['name']} express:\n
 {history[-1]['content']}
 
-These are the information points {charaSet['name']} want to express in {charaSet['name']}'s response:
+By considering {charaSet['name']}'s traits and the dialogue's content, {writer} considered these information points that {charaSet['name']} may want to express in {charaSet['name']}'s response:
 {info_points}
 
-Here is how {charaSet['name']} would express these points in {charaSet['name']}'s tone in {setting['language']}:
+{writer} now writes how {charaSet['name']} would express these points in {charaSet['name']}'s tone in {setting['language']}:
 "    
 """
 
