@@ -6,5 +6,6 @@
         "content": "You are a helpful assistant."
     },
     "max_tokens": 256,
-    "temperature": 1.0
+    "temperature": 1.0,
+    "language": "English"
 }

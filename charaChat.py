@@ -55,6 +55,7 @@ class CharaChat(Chat):
         tone_response = openai.Completion.create(
             model="text-davinci-003",
             prompt=get_tone_prompts(
+                setting=self.setting, 
                 charaSet=self.chara,
                 userSet=self.user,
                 history=self.real_history,

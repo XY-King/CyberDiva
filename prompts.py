@@ -124,7 +124,7 @@ def get_begin_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
     ) + get_info_point_prompts(charaSet=charaSet, userSet=userSet)
 
 
-def get_tone_prompts(charaSet: dict, userSet: dict, history: list, info_points: string, filtered_setting: dict, api_key: string):
+def get_tone_prompts(setting: dict, charaSet: dict, userSet: dict, history: list, info_points: string, filtered_setting: dict, api_key: string):
     # preperation
     sayings = combine_sayings(filtered_setting["sayings"])
     story = combine_sayings(filtered_setting["story"])
@@ -162,7 +162,7 @@ This is what {userSet['name']} express:\n
 These are the information points {charaSet['name']} want to express in {charaSet['name']}'s response:
 {info_points}
 
-Here is how {charaSet['name']} would express these points in {charaSet['name']}'s tone:
+Here is how {charaSet['name']} would express these points in {charaSet['name']}'s tone in {setting['language']}:
 "    
 """
 
