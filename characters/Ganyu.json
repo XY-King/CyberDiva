@@ -1,6 +1,7 @@
 {
     "is_embedded": true,
     "name": "Ganyu",
+    "response_depth": 2,
     "sayings": [
         "Hello\tCopy that! Here is a draft Service Agreement for your review and consideration. Effective immediately, if all is in order... Ah! Wait a sec, wait a sec, I forgot to sign it... Gan... Yu... There. Right. Now... What was it you needed me to do for you exactly?",
         "Chat: Relaxed\tIt's so nice to de-stress.",

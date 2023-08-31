@@ -1,9 +1,33 @@
 import string
 from chat import Chat
-from prompts import get_begin_prompts, get_tone_prompts, filter_sayings
+from prompts import (
+    get_begin_prompts,
+    get_tone_prompts,
+    filter_sayings,
+    filter_info_points,
+)
 import openai
 from openai.embeddings_utils import get_embedding
 import os
+
+
+reaction_func = [
+    {
+        "name": "trigger_live2d_motion",
+        "description": "Make the live2d of the imaginary character do a motion according to the response of the character.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "motion": {
+                    "type": "string",
+                    "enum": ["idle", "smile", "angry", "embarrassed", "bye", "nod"],
+                    "description": "The name of the motion that the live2d will do.",
+                },
+            },
+            "required": ["motion"],
+        },
+    }
+]
 
 
 class CharaChat(Chat):
@@ -50,12 +74,37 @@ class CharaChat(Chat):
         self.real_history.append(
             with_embedding({"role": "user", "content": input}, self.setting["api_key"])
         )
+    
+    def get_response(self):
+        response = openai.ChatCompletion.create(
+            model=self.setting["model"],
+            messages=self.history,
+            max_tokens=self.setting["max_tokens"],
+            temperature=self.setting["temperature"],
+        )
+        motion_response = openai.ChatCompletion.create(
+            model=self.setting["model"],
+            messages=self.history,
+            max_tokens=self.setting["max_tokens"],
+            temperature=self.setting["temperature"],
+            functions=reaction_func,
+            function_call={"name": "trigger_live2d_motion"},
+        )
+        print(motion_response.choices[0]["message"])
+        input()
+        return response.choices[0]["message"]["content"]
 
     def add_response(self, response: string):
+        response = filter_info_points(
+            info_points=response,
+            input=self.history[-1]["content"],
+            api_key=self.setting["api_key"],
+            charaSet=self.chara,
+        )
         tone_response = openai.Completion.create(
             model="text-davinci-003",
             prompt=get_tone_prompts(
-                setting=self.setting, 
+                setting=self.setting,
                 charaSet=self.chara,
                 userSet=self.user,
                 history=self.real_history,
@@ -92,8 +141,6 @@ class CharaChat(Chat):
 
 
 # HELPER FUNCTIONS
-
-
 def with_embedding(msg: dict, api_key: string):
     openai.api_key = api_key
     embedding = get_embedding(text=msg["content"], engine="text-embedding-ada-002")

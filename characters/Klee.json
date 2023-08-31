@@ -1,6 +1,7 @@
 {
     "is_embedded": true,
     "name": "Klee",
+    "response_depth": 1,
     "sayings": [
         "Hello\tSpark Knight Klee of the Knights of Favonius, reporting for duty! ...There's some more, but uh, I forgot. I'm not so good at remembering...",
         "Chat: Spoils\tKlee was a brave girl today! I found a really weird-looking lizard! Want me to show it to you?",
