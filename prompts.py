@@ -49,14 +49,14 @@ def combine_sayings(sayings: list):
 def name_embedded_msg(charaSet: dict, userSet: dict, msg: dict):
     # if there exists "motion" key
     if "motion" in msg:
-        nContent = f"({charaSet['name']} {msg['motion']}) "
+        nContent = f"{charaSet['name']} {msg['motion']}, and says: "
     else:
         nContent = ""
 
     if msg["content"]["role"] == "user":
         nContent += userSet["name"] + ": " + msg["content"]["content"]
     else:
-        nContent += charaSet["name"] + ": " + msg["content"]["content"]
+        nContent += msg["content"]["content"]
     
     return {"content": nContent, "embedding": msg["embedding"]}
 

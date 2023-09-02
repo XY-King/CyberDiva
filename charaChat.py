@@ -130,8 +130,8 @@ class CharaChat(Chat):
                 break
         # delete the nonsense at the end of the response
         for i in range(len(tone_text) - 1, -1, -1):
-            if not tone_text[i] in ["\n", " ", '"']:
-                tone_text = tone_text[: i + 1]
+            if tone_text[i] == "\"":
+                tone_text = tone_text[: i]
                 break
 
         self.history.append({"role": "assistant", "content": response})
