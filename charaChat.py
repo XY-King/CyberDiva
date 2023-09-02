@@ -74,7 +74,7 @@ class CharaChat(Chat):
         self.real_history.append(
             with_embedding({"role": "user", "content": input}, self.setting["api_key"])
         )
-    
+
     def get_response(self):
         response = openai.ChatCompletion.create(
             model=self.setting["model"],
@@ -90,11 +90,16 @@ class CharaChat(Chat):
             functions=reaction_func,
             function_call={"name": "trigger_live2d_motion"},
         )
-        print(motion_response.choices[0]["message"])
-        input()
-        return response.choices[0]["message"]["content"]
 
-    def add_response(self, response: string):
+        motion_response = motion_response.choices[0]["message"]
+        motion_response = motion_response["function_call"]["arguments"]
+        # translate the string to dict
+        motion_response = eval(motion_response)
+        motion_response = motion_response["motion"]
+
+        return response.choices[0]["message"]["content"], motion_response
+
+    def add_response(self, response: string, motion: string):
         response = filter_info_points(
             info_points=response,
             input=self.history[-1]["content"],
@@ -109,6 +114,7 @@ class CharaChat(Chat):
                 userSet=self.user,
                 history=self.real_history,
                 info_points=response,
+                motion=motion,
                 filtered_setting=self.filtered_setting,
                 api_key=self.setting["api_key"],
             ),
@@ -122,11 +128,21 @@ class CharaChat(Chat):
             if not tone_text[i] in ["\n", " ", '"']:
                 tone_text = tone_text[i:]
                 break
+        # delete the nonsense at the end of the response
+        for i in range(len(tone_text) - 1, -1, -1):
+            if not tone_text[i] in ["\n", " ", '"']:
+                tone_text = tone_text[: i + 1]
+                break
 
         self.history.append({"role": "assistant", "content": response})
         self.real_history.append(
             with_embedding(
-                {"role": "assistant", "content": tone_text}, self.setting["api_key"]
+                {
+                    "role": "assistant",
+                    "motion": motion,
+                    "content": tone_text,
+                },
+                self.setting["api_key"],
             )
         )
 

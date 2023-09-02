@@ -47,15 +47,20 @@ def combine_sayings(sayings: list):
 
 # name a msg with embedding
 def name_embedded_msg(charaSet: dict, userSet: dict, msg: dict):
-    if msg["content"]["role"] == "user":
-        nContent = userSet["name"] + ": " + msg["content"]["content"]
+    # if there exists "motion" key
+    if "motion" in msg:
+        nContent = f"({charaSet['name']} {msg['motion']}) "
     else:
-        nContent = charaSet["name"] + ": " + msg["content"]["content"]
+        nContent = ""
 
+    if msg["content"]["role"] == "user":
+        nContent += userSet["name"] + ": " + msg["content"]["content"]
+    else:
+        nContent += charaSet["name"] + ": " + msg["content"]["content"]
+    
     return {"content": nContent, "embedding": msg["embedding"]}
 
 
-# seperate the info points into a list
 def filter_info_points(
     info_points: string, input: string, api_key: string, charaSet: dict
 ):
@@ -74,6 +79,9 @@ def filter_info_points(
         num=charaSet["response_depth"],
         is_stable=True,
     )
+    for info in filtered_info:
+        if info == "":
+            filtered_info.remove(info)
     done_info = combine_sayings(filtered_info)
     return done_info
 
@@ -162,6 +170,7 @@ def get_tone_prompts(
     userSet: dict,
     history: list,
     info_points: string,
+    motion: string,
     filtered_setting: dict,
     api_key: string,
 ):
@@ -213,6 +222,7 @@ Then, this is what {userSet['name']} express:\n
 
 By considering {charaSet['name']}'s traits and the dialogue's content, {writer} considered these information points that {charaSet['name']} may want to express in {charaSet['name']}'s response:
 {info_points}
+Also, {writer} considered that {charaSet['name']} would {motion} in {charaSet['name']}'s response.
 
 {writer} now writes how {charaSet['name']} would express these points in {charaSet['name']}'s tone in {setting['language']}:
 "    

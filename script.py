@@ -32,8 +32,8 @@ def main():
             input()
         else:
             core.user_input(user_input)
-            core.add_response(core.get_response())
-
+            response, motion = core.get_response()
+            core.add_response(response=response, motion=motion)
 
 if __name__ == "__main__":
     main()
