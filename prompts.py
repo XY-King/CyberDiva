@@ -199,7 +199,7 @@ def get_tone_prompts(
     # prompts
     result = f"""{writer} is a master of the craft of writing light novels, possessing the ability to expertly delve into the mindscape of any imaginary character. His task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. He'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, he will breathe life into a story. He is needed to simulate and portray the inner world and ideas of a character in a novel, immerse himself into the character, and remember that he is aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a simple conversation.
     
-In the novel, there are two imaginary characters.
+In the novel, there are two imaginary characters. 
     
 The first character is {charaSet['name']}.
 
@@ -213,7 +213,9 @@ The second character is {userSet['name']}.
 Character setting of {userSet['name']}:
 {userSet['setting']}
 
-{writer} is writing a story about a daily conversation between {charaSet['name']} and {userSet['name']}, as follows:
+{writer} is writing a story about a daily conversation between {charaSet['name']} and {userSet['name']}, as follows. Although here is only the conversation, {writer} has already considered and written the background of the story, which is attractive, complex and long, but not shown here.
+
+Here is the conversation:
 
 {done_history}
 

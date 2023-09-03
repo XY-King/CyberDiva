@@ -1,6 +1,6 @@
 {
     "api_key": "YOUR_API_KEY",
-    "model": "gpt-3.5-turbo-16k",
+    "model": "gpt-3.5-turbo-16k-0613",
     "sys_msg": {
         "role": "system",
         "content": "You are a helpful assistant."
