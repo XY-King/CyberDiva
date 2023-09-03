@@ -11,25 +11,6 @@ from openai.embeddings_utils import get_embedding
 import os
 
 
-reaction_func = [
-    {
-        "name": "trigger_live2d_motion",
-        "description": "Make the live2d of the imaginary character do a motion according to the response of the character.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "motion": {
-                    "type": "string",
-                    "enum": ["idle", "smile", "angry", "embarrassed", "bye", "nod"],
-                    "description": "The name of the motion that the live2d will do.",
-                },
-            },
-            "required": ["motion"],
-        },
-    }
-]
-
-
 class CharaChat(Chat):
     def __init__(self, charaSet: dict, chatSet: dict, userSet: dict):
         super().__init__(chatSet)
@@ -87,7 +68,7 @@ class CharaChat(Chat):
             messages=self.history,
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
-            functions=reaction_func,
+            functions=reaction_func(charaSet=self.chara),
             function_call={"name": "trigger_live2d_motion"},
         )
 
@@ -100,6 +81,8 @@ class CharaChat(Chat):
         return response.choices[0]["message"]["content"], motion_response
 
     def add_response(self, response: string, motion: string):
+        print(motion)
+        input()
         response = filter_info_points(
             info_points=response,
             input=self.history[-1]["content"],
@@ -131,7 +114,7 @@ class CharaChat(Chat):
         # delete the nonsense at the end of the response
         for i in range(len(tone_text) - 1, -1, -1):
             if tone_text[i] == "\"":
-                tone_text = tone_text[: i]
+                tone_text = tone_text[:i]
                 break
 
         self.history.append({"role": "assistant", "content": response})
@@ -161,3 +144,25 @@ def with_embedding(msg: dict, api_key: string):
     openai.api_key = api_key
     embedding = get_embedding(text=msg["content"], engine="text-embedding-ada-002")
     return {"content": msg, "embedding": embedding}
+
+
+# OPENAI FUNCTION CALLING
+def reaction_func(charaSet: dict):
+    result = [
+        {
+            "name": "trigger_live2d_motion",
+            "description": "Make the live2d of the imaginary character do a motion according to the response of the character.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "motion": {
+                        "type": "string",
+                        "enum": charaSet["motions"],
+                        "description": "The name of the motion that the live2d will do.",
+                    },
+                },
+                "required": ["motion"],
+            },
+        }
+    ]
+    return result
