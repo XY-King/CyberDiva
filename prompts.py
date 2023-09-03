@@ -226,11 +226,10 @@ By considering {charaSet['name']}'s traits and the dialogue's content, {writer} 
 {info_points}
 Also, {writer} considered that {charaSet['name']} would {motion} in {charaSet['name']}'s response.
 
+In the story, you should put the character's thoughts and actions between brackets.
+
 {writer} now writes how {charaSet['name']} would express these points in {charaSet['name']}'s tone in {setting['language']}:
 "    
 """
-
-    print(result)
-    input()
 
     return result

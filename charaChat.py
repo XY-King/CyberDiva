@@ -137,6 +137,9 @@ class CharaChat(Chat):
                 print("You: " + msg["content"])
             else:
                 print(self.chara["name"] + ": " + msg["content"])
+    
+    def trigger_live2d(self):
+        pass
 
 
 # HELPER FUNCTIONS
