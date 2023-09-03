@@ -1,7 +1,7 @@
 import json
 from charaChat import CharaChat
 from read import get_chara_config
-import os
+import os 
 
 def get_config_id():
     if os.path.exists("my_config.json"):
@@ -32,9 +32,9 @@ def main():
             input()
         else:
             core.user_input(user_input)
-            response, motion = core.get_response()
-            core.add_response(response=response, motion=motion)
-        core.trigger_live2d()
+            response = core.get_response()
+            core.add_response(response=response)
+        # core.trigger_live2d()
 
 if __name__ == "__main__":
     main()

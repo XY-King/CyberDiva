@@ -47,16 +47,10 @@ def combine_sayings(sayings: list):
 
 # name a msg with embedding
 def name_embedded_msg(charaSet: dict, userSet: dict, msg: dict):
-    # if there exists "motion" key
-    if "motion" in msg:
-        nContent = f"{charaSet['name']} {msg['motion']}, and says: "
-    else:
-        nContent = ""
-
     if msg["content"]["role"] == "user":
-        nContent += userSet["name"] + ": " + msg["content"]["content"]
+        nContent = userSet["name"] + ": " + msg["content"]["content"]
     else:
-        nContent += msg["content"]["content"]
+        nContent = charaSet["name"] + ": " + msg["content"]["content"]
     
     return {"content": nContent, "embedding": msg["embedding"]}
 
@@ -170,7 +164,6 @@ def get_tone_prompts(
     userSet: dict,
     history: list,
     info_points: string,
-    motion: string,
     filtered_setting: dict,
     api_key: string,
 ):
@@ -224,9 +217,8 @@ Then, this is what {userSet['name']} express:\n
 
 By considering {charaSet['name']}'s traits and the dialogue's content, {writer} considered these information points that {charaSet['name']} may want to express in {charaSet['name']}'s response:
 {info_points}
-Also, {writer} considered that {charaSet['name']} would {motion} in {charaSet['name']}'s response.
 
-In the story, you should put the character's thoughts and actions between small brackets.
+In the story, {writer} will put the character's thoughts and actions between brackets. He will put actions at every necessary interval to make the story more immersive. 
 
 {writer} now writes how {charaSet['name']} would express these points in {charaSet['name']}'s tone in {setting['language']}:
 "    

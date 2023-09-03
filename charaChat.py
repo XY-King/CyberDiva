@@ -59,33 +59,7 @@ class CharaChat(Chat):
             with_embedding({"role": "user", "content": input}, self.setting["api_key"])
         )
 
-    def get_response(self):
-        response = openai.ChatCompletion.create(
-            model=self.setting["model"],
-            messages=self.history,
-            max_tokens=self.setting["max_tokens"],
-            temperature=self.setting["temperature"],
-        )
-        motion_response = openai.ChatCompletion.create(
-            model=self.setting["model"],
-            messages=self.history,
-            max_tokens=self.setting["max_tokens"],
-            temperature=self.setting["temperature"],
-            functions=reaction_func(charaSet=self.chara),
-            function_call={"name": "trigger_live2d_motion"},
-        )
-
-        motion_response = motion_response.choices[0]["message"]
-        motion_response = motion_response["function_call"]["arguments"]
-        # translate the string to dict
-        motion_response = eval(motion_response)
-        motion_response = motion_response["motion"]
-
-        return response.choices[0]["message"]["content"], motion_response
-
-    def add_response(self, response: string, motion: string):
-        print(motion)
-        input()
+    def add_response(self, response: string):
         response = filter_info_points(
             info_points=response,
             input=self.history[-1]["content"],
@@ -100,7 +74,6 @@ class CharaChat(Chat):
                 userSet=self.user,
                 history=self.real_history,
                 info_points=response,
-                motion=motion,
                 filtered_setting=self.filtered_setting,
                 api_key=self.setting["api_key"],
             ),
@@ -109,23 +82,13 @@ class CharaChat(Chat):
         )
 
         tone_text = tone_response["choices"][0]["text"]
-        # delete the nonsense at the beginning of the response
-        for i in range(len(tone_text)):
-            if not tone_text[i] in ["\n", " ", '"']:
-                tone_text = tone_text[i:]
-                break
-        # delete the nonsense at the end of the response
-        for i in range(len(tone_text) - 1, -1, -1):
-            if tone_text[i] == '"':
-                tone_text = tone_text[:i]
-                break
+        tone_text = clean_response(tone_text)
 
         self.history.append({"role": "assistant", "content": response})
         self.real_history.append(
             with_embedding(
                 {
                     "role": "assistant",
-                    "motion": motion,
                     "content": tone_text,
                 },
                 self.setting["api_key"],
@@ -182,24 +145,23 @@ def with_embedding(msg: dict, api_key: string):
     embedding = get_embedding(text=msg["content"], engine="text-embedding-ada-002")
     return {"content": msg, "embedding": embedding}
 
-
-# OPENAI FUNCTION CALLING
-def reaction_func(charaSet: dict):
-    result = [
-        {
-            "name": "trigger_live2d_motion",
-            "description": "Make the live2d of the imaginary character do a motion according to the response of the character.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "motion": {
-                        "type": "string",
-                        "enum": charaSet["motions"],
-                        "description": "The name of the motion that the live2d will do.",
-                    },
-                },
-                "required": ["motion"],
-            },
-        }
-    ]
-    return result
+def clean_response(response: string):
+    # clear all the contents in the brackets
+    # while True:
+    #     if not "(" in response:
+    #         break
+    #     else:
+    #         left = response.index("(")
+    #         right = response.index(")")
+    #         response = response[:left] + response[right + 1 :]
+    # delete the nonsense at the beginning of the response
+    for i in range(len(response)):
+        if not response[i] in ["\n", " ", '"']:
+            response = response[i:]
+            break
+    # delete the nonsense at the end of the response
+    for i in range(len(response) - 1, -1, -1):
+        if response[i] == '"':
+            response = response[:i]
+            break
+    return response
