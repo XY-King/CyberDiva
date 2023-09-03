@@ -34,6 +34,7 @@ def main():
             core.user_input(user_input)
             response, motion = core.get_response()
             core.add_response(response=response, motion=motion)
+        core.trigger_live2d()
 
 if __name__ == "__main__":
     main()

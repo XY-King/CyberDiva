@@ -9,6 +9,9 @@ from prompts import (
 import openai
 from openai.embeddings_utils import get_embedding
 import os
+import json
+import asyncio
+import websockets
 
 
 class CharaChat(Chat):
@@ -113,7 +116,7 @@ class CharaChat(Chat):
                 break
         # delete the nonsense at the end of the response
         for i in range(len(tone_text) - 1, -1, -1):
-            if tone_text[i] == "\"":
+            if tone_text[i] == '"':
                 tone_text = tone_text[:i]
                 break
 
@@ -137,9 +140,40 @@ class CharaChat(Chat):
                 print("You: " + msg["content"])
             else:
                 print(self.chara["name"] + ": " + msg["content"])
-    
+
     def trigger_live2d(self):
-        pass
+        msg = self.real_history[-1]["content"]
+        motion = msg["motion"]
+        msg = msg["content"]
+
+        text_msg = {
+            "msg": 11000,
+            "msgId": 1,
+            "data": {
+                "id": 0,
+                "text": msg,
+                "textFrameColor": 0x000000,
+                "textColor": 0xFFFFFF,
+                "duration": 10000,
+            },
+        }
+
+        motion_msg = {
+            "msg": 13200,
+            "msgId": 1,
+            "data": {"id": 0, "type": 0, "mtn": motion},
+        }
+
+        async def send_message():
+            async with websockets.connect("ws://127.0.0.1:10086/api") as ws:
+                message = motion_msg
+                await ws.send(json.dumps(message))
+                message = text_msg
+                await ws.send(json.dumps(message))
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(send_message())
 
 
 # HELPER FUNCTIONS
