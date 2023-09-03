@@ -3,7 +3,9 @@ import string
 import openai
 from openai.embeddings_utils import get_embeddings, get_embedding
 
+
 def get_chara_config(api_key: string):
+    # get character setting
     name = json.load(open("chara.json", "rb"))["name"]
     is_embedded = json.load(open(f"characters/{name}.json", "rb"))["is_embedded"]
 
@@ -11,7 +13,17 @@ def get_chara_config(api_key: string):
         embed_chara(name, api_key)
 
     charaSet = json.load(open(f"characters/{name}_embedded.json", "rb"))
+
+    # get live2d setting
+    live2d_name = json.load(open("chara.json", "rb"))["live2d"]
+    live2d_model = json.load(open(f"live2d/{live2d_name}/model.json", "rb"))
+    live2d_motions = live2d_model["motions"]
+    # get all the keys of the motions and transform it into a list
+    live2d_motions_keys = list(live2d_motions.keys())
+
+    charaSet["motions"] = live2d_motions_keys
     return charaSet
+
 
 # make the sayings of the character into embeddings
 def embed_chara(name: string, api_key: string):
@@ -19,19 +31,27 @@ def embed_chara(name: string, api_key: string):
     openai.api_key = api_key
 
     # get the embeddings for the sayings and the story
-    saying_embeddings = get_embeddings(list_of_text=charaInit["sayings"], engine="text-embedding-ada-002")
-    story_embeddings = get_embeddings(list_of_text=charaInit["story"], engine="text-embedding-ada-002")
-    
+    saying_embeddings = get_embeddings(
+        list_of_text=charaInit["sayings"], engine="text-embedding-ada-002"
+    )
+    story_embeddings = get_embeddings(
+        list_of_text=charaInit["story"], engine="text-embedding-ada-002"
+    )
+
     # make the json file of the character with the embeddings
     sayings_embedded = []
     for i in range(len(charaInit["sayings"])):
         embedding = saying_embeddings[i]
-        sayings_embedded.append({"content": charaInit["sayings"][i], "embedding": embedding})
-    
+        sayings_embedded.append(
+            {"content": charaInit["sayings"][i], "embedding": embedding}
+        )
+
     story_embedded = []
     for i in range(len(charaInit["story"])):
         embedding = story_embeddings[i]
-        story_embedded.append({"content": charaInit["story"][i], "embedding": embedding})
+        story_embedded.append(
+            {"content": charaInit["story"][i], "embedding": embedding}
+        )
 
     # change the "is_embedded" to True
     charaInit["is_embedded"] = True
