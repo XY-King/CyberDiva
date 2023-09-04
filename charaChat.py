@@ -94,6 +94,7 @@ class CharaChat(Chat):
                 self.setting["api_key"],
             )
         )
+        return seperate_response(tone_text)
 
     def print_history(self):
         os.system("cls")
@@ -104,10 +105,14 @@ class CharaChat(Chat):
             else:
                 print(self.chara["name"] + ": " + msg["content"])
 
-    def trigger_live2d(self):
-        msg = self.real_history[-1]["content"]
-        motion = msg["motion"]
-        msg = msg["content"]
+    def trigger_live2d(self, response_list: list):
+        for response in response_list:
+            if response["type"] == "motion":
+                msg = {
+                    "msg": 13200,
+                    "msgId": 1,
+                    "data": {"id": 0, "type": 0, "mtn": motion},
+                }
 
         text_msg = {
             "msg": 11000,
@@ -145,15 +150,10 @@ def with_embedding(msg: dict, api_key: string):
     embedding = get_embedding(text=msg["content"], engine="text-embedding-ada-002")
     return {"content": msg, "embedding": embedding}
 
+# def get_closest_motion(response: string, motions: list):
+
+
 def clean_response(response: string):
-    # clear all the contents in the brackets
-    # while True:
-    #     if not "(" in response:
-    #         break
-    #     else:
-    #         left = response.index("(")
-    #         right = response.index(")")
-    #         response = response[:left] + response[right + 1 :]
     # delete the nonsense at the beginning of the response
     for i in range(len(response)):
         if not response[i] in ["\n", " ", '"']:
@@ -161,7 +161,29 @@ def clean_response(response: string):
             break
     # delete the nonsense at the end of the response
     for i in range(len(response) - 1, -1, -1):
-        if response[i] == '"':
-            response = response[:i]
+        if not response[i] in ["\n", " ", '"']:
+            response = response[: i + 1]
             break
     return response
+
+
+def seperate_response(response: string):
+    response_list = []
+    # seperate the response into a list of strings by contents in brackets
+    while True:
+        if not "[" in response:
+            if not response in ["", "\n", " ", '"']:
+                response_list.append({"type": "text", "content": response})
+            break
+        else:
+            left = response.index("[")
+            right = response.index("]")
+            content_in = response[left + 1 : right]
+            content_before = response[:left]
+            content_after = response[right + 1 :]
+            if not content_before in ["", "\n", " ", '"']:
+                response_list.append({"type": "text", "content": content_before})
+            response_list.append({"type": "motion", "content": content_in})
+            response = content_after
+
+    return response_list

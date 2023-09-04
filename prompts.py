@@ -218,7 +218,7 @@ Then, this is what {userSet['name']} express:\n
 By considering {charaSet['name']}'s traits and the dialogue's content, {writer} considered these information points that {charaSet['name']} may want to express in {charaSet['name']}'s response:
 {info_points}
 
-In the story, {writer} will put the character's thoughts and actions between brackets. He will put actions at every necessary interval to make the story more immersive. 
+In the story, {writer} will put all the character's thoughts and actions between brackets []. He will put actions at every necessary interval to make the story more immersive. 
 
 {writer} now writes how {charaSet['name']} would express these points in {charaSet['name']}'s tone in {setting['language']}:
 "    

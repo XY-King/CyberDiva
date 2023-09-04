@@ -1,6 +1,7 @@
 import json
 import string
 import openai
+import os
 from openai.embeddings_utils import get_embeddings, get_embedding
 
 
@@ -16,12 +17,10 @@ def get_chara_config(api_key: string):
 
     # get live2d setting
     live2d_name = json.load(open("chara.json", "rb"))["live2d"]
-    live2d_model = json.load(open(f"live2d/{live2d_name}/model.json", "rb"))
-    live2d_motions = live2d_model["motions"]
-    # get all the keys of the motions and transform it into a list
-    live2d_motions_keys = list(live2d_motions.keys())
-
-    charaSet["motions"] = live2d_motions_keys
+    embed_live2d_motions(live2d_name, api_key)
+    with open(f"live2d/{live2d_name}/motions_embedded.json", "rb") as f:
+        live2d_motions = json.load(f)
+    charaSet["motions"] = live2d_motions
     return charaSet
 
 
@@ -62,3 +61,31 @@ def embed_chara(name: string, api_key: string):
     charaInit["story"] = story_embedded
     with open(f"characters/{name}_embedded.json", "w", encoding="UTF-8") as f:
         json.dump(charaInit, f, ensure_ascii=False, indent=4)
+
+
+def embed_live2d_motions(live2d_name: string, api_key: string):
+    # if the motions_embedded.json file exists, then return
+    if os.path.exists(f"live2d/{live2d_name}/motions_embedded.json"):
+        return
+
+    # get the motions
+    live2d_model = json.load(open(f"live2d/{live2d_name}/model.json", "rb"))
+    live2d_motions = live2d_model["motions"]
+    # get all the keys of the motions and transform it into a list
+    live2d_motions = list(live2d_motions.keys())
+
+    # embed the motions
+    openai.api_key = api_key
+    motion_embeddings = get_embeddings(
+        list_of_text=live2d_motions, engine="text-embedding-ada-002"
+    )
+    # make the json file of the motions with the embeddings
+    motions_embedded = []
+    for i in range(len(live2d_motions)): 
+        embedding = motion_embeddings[i]
+        motions_embedded.append(
+            {"content": live2d_motions[i], "embedding": embedding}
+        )
+    # output the json file with embeddings
+    with open(f"live2d/{live2d_name}/motions_embedded.json", "w", encoding="UTF-8") as f:
+        json.dump(motions_embedded, f, ensure_ascii=False, indent=4)

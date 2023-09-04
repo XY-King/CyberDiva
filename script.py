@@ -33,8 +33,8 @@ def main():
         else:
             core.user_input(user_input)
             response = core.get_response()
-            core.add_response(response=response)
-        # core.trigger_live2d()
+            response_list = core.add_response(response=response)
+            #core.trigger_live2d(response_list)
 
 if __name__ == "__main__":
     main()
