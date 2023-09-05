@@ -58,7 +58,16 @@ def name_embedded_msg(charaSet: dict, userSet: dict, msg: dict):
 def filter_info_points(
     info_points: string, input: string, api_key: string, charaSet: dict
 ):
+    # delete the nonsense at the beginning
+    for i in range(len(info_points)):
+        if info_points[i] == "1":
+            info_points = info_points[i:]
+            break
     info_list = info_points.split("\n")
+    # remove the info points which are too short
+    for i in range(len(info_list) - 1, -1, -1):
+        if len(info_list[i]) <= 5:
+            info_list.pop(i)
     info_embeddings = get_embeddings(
         list_of_text=info_list, engine="text-embedding-ada-002"
     )
@@ -89,7 +98,7 @@ def get_intro_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
     story = combine_sayings(filtered_setting["story"])
 
     # prompts
-    chara = f"""You are a master of the craft of writing light novels, possessing the ability to expertly delve into the mindscape of any imaginary character. Your task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. You'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, I need your unique skill set to help me breathe life into my narrative. I need you to simulate and portray the inner world and ideas of a character in my novel. Immerse yourself into the character, and remember we're aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a simple description.
+    chara = f"""You are a master of the craft of writing scripts, possessing the ability to expertly delve into the mindscape of any imaginary character. Your task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. You'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, I need your unique skill set to help me breathe life into my scripts for a story. I need you to simulate and portray the inner world and ideas of a character in my story. Immerse yourself into the character, and remember we're aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a normal description.
     
 I am now writing a story about the relationship and daily conversation between two imaginary characters.
 
@@ -110,7 +119,7 @@ Character name: {userSet["name"]}
 
 Character setting: {userSet["setting"]}
 
-I will input what {userSet["name"]} says in the story, and you shall output the response of Klee in the story."""
+I will input what {userSet["name"]} says in the story's scripts, and you shall output the response of {charaSet["name"]} in the scripts."""
 
     return [
         {"role": "user", "content": chara},
@@ -121,7 +130,7 @@ I will input what {userSet["name"]} says in the story, and you shall output the 
         {"role": "assistant", "content": user},
         {
             "role": "assistant",
-            "content": f"Ok, I am now going to help you write the story by simulating the response of the imaginary character {charaSet['name']}.",
+            "content": f"Ok, I am now going to help you write the scripts of the story by simulating the response of the imaginary character {charaSet['name']}.",
         },
     ]
 
@@ -130,13 +139,15 @@ def get_info_point_prompts(charaSet: dict, userSet: dict):
     result = []
 
     info_point_prompts = [
-        f"To help me write the story,  you should output the information points in the response of {charaSet['name']} in the form of a list.",
+        f"To help me write the scripts of the story, you should output the information points in the response of {charaSet['name']} in the form of a list.",
         "Ok, let's make a sample conversation.",
         f"{userSet['name']}: Today's weather is nice.",
         f"{charaSet['name']}: \n1. Agreeing with the weather",
         f"{userSet['name']}: Would you like to have lunch with me?",
         f"{charaSet['name']}: \n1. Showing agreement\n2. Asking what to have for lunch",
-        "Ok, let's now begin a story.",
+        "Ok, let's now begin the scripts of a story.",
+        "In the story, {charaSet['name']} will not only express him/herself towards {userSet['name']}, but also expressing his/her own ideas actively.", 
+        "Ok, this can definitely help breath life into the scripts of the story."
     ]
 
     for i, prompt in enumerate(info_point_prompts):
@@ -145,7 +156,7 @@ def get_info_point_prompts(charaSet: dict, userSet: dict):
         else:
             result.append({"role": "assistant", "content": prompt})
 
-    end = f"Ok, in the story I will simulate the response of the imaginary character {charaSet['name']} and output the information points in the form of a list."
+    end = f"Ok, in the story I will simulate the response of the imaginary character {charaSet['name']} and output the information points for the scripts in the form of a list."
 
     result.append({"role": "assistant", "content": end})
 
@@ -190,9 +201,9 @@ def get_tone_prompts(
         done_history = combine_sayings(filtered_history)
 
     # prompts
-    result = f"""{writer} is a master of the craft of writing light novels, possessing the ability to expertly delve into the mindscape of any imaginary character. His task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. He'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, he will breathe life into a story. He is needed to simulate and portray the inner world and ideas of a character in a novel, immerse himself into the character, and remember that he is aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a simple conversation.
+    result = f"""{writer} is a master of the craft of writing scripts, possessing the ability to expertly delve into the mindscape of any imaginary character. His task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. He'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, he will breathe life into the scripts of a story. He is needed to simulate and portray the inner world and ideas of a character in a story, immerse himself into the character, and remember that he is aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a normal conversation.
     
-In the novel, there are two imaginary characters. 
+In the story, there are two imaginary characters. 
     
 The first character is {charaSet['name']}.
 
@@ -206,7 +217,7 @@ The second character is {userSet['name']}.
 Character setting of {userSet['name']}:
 {userSet['setting']}
 
-{writer} is writing a story about a daily conversation between {charaSet['name']} and {userSet['name']}, as follows. Although here is only the conversation, {writer} has already considered and written the background of the story, which is attractive, complex and long, but not shown here.
+{writer} is writing the scripts of a story about a daily conversation between {charaSet['name']} and {userSet['name']}, as follows. Although here is only the conversation, {writer} has already considered and written the background of the story, which is attractive, complex and long, but not shown here.
 
 Here is the conversation:
 
@@ -218,7 +229,7 @@ Then, this is what {userSet['name']} express:\n
 By considering {charaSet['name']}'s traits and the dialogue's content, {writer} considered these information points that {charaSet['name']} may want to express in {charaSet['name']}'s response:
 {info_points}
 
-In the story, {writer} will put all the character's thoughts and actions between brackets []. He will put actions at every necessary interval to make the story more immersive. 
+In the story, {writer} will put all the character's thoughts and actions between brackets []. He will put actions at every necessary interval to make the story more immersive. The script texts between each two actions should be short and expressive. {charaSet['name']} will not only express him/herself towards {userSet['name']}, but also expressing his/her own ideas actively.
 
 {writer} now writes how {charaSet['name']} would express these points in {charaSet['name']}'s tone in {setting['language']}:
 "    

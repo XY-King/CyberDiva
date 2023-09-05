@@ -94,7 +94,7 @@ class CharaChat(Chat):
                 self.setting["api_key"],
             )
         )
-        return seperate_response(tone_text)
+        return pair_response_list(response_list=seperate_response(tone_text, self.chara))
 
     def print_history(self):
         os.system("cls")
@@ -105,43 +105,47 @@ class CharaChat(Chat):
             else:
                 print(self.chara["name"] + ": " + msg["content"])
 
-    def trigger_live2d(self, response_list: list):
-        for response in response_list:
-            if response["type"] == "motion":
-                msg = {
-                    "msg": 13200,
-                    "msgId": 1,
-                    "data": {"id": 0, "type": 0, "mtn": motion},
-                }
-
-        text_msg = {
-            "msg": 11000,
-            "msgId": 1,
-            "data": {
-                "id": 0,
-                "text": msg,
-                "textFrameColor": 0x000000,
-                "textColor": 0xFFFFFF,
-                "duration": 10000,
-            },
-        }
-
-        motion_msg = {
-            "msg": 13200,
-            "msgId": 1,
-            "data": {"id": 0, "type": 0, "mtn": motion},
-        }
-
-        async def send_message():
+    def trigger_live2d(self, response_pairs: list):
+        async def send_message(myMotion, myText):
+            motion_msg = {
+                "msg": 13200,
+                "msgId": 1,
+                "data": {"id": 0, "type": 0, "mtn": myMotion},
+            }
+            text_msg = {
+                "msg": 11000,
+                "msgId": 1,
+                "data": {
+                    "id": 0,
+                    "text": myText,
+                    "textFrameColor": 0x000000,
+                    "textColor": 0xFFFFFF,
+                    "duration": 10000,
+                },
+            }
             async with websockets.connect("ws://127.0.0.1:10086/api") as ws:
-                message = motion_msg
-                await ws.send(json.dumps(message))
-                message = text_msg
-                await ws.send(json.dumps(message))
+                if myMotion != "":
+                    await ws.send(json.dumps(motion_msg))
+                if myText != "":
+                    await ws.send(json.dumps(text_msg))
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(send_message())
+        loop = asyncio.get_event_loop()
+        for response in response_pairs:
+            if response["motion"] != "":
+                motion = filter_sayings(
+                    sayings=self.chara["motions"],
+                    input=response["motion"],
+                    api_key=self.setting["api_key"],
+                    num=1,
+                )[0]["content"]
+            else:
+                motion = ""
+            loop.run_until_complete(
+                send_message(motion, response["text"])
+            )
+            sleep_time = 0.1 * len(response["text"])
+            loop.run_until_complete(asyncio.sleep(sleep_time))
+            
 
 
 # HELPER FUNCTIONS
@@ -149,9 +153,6 @@ def with_embedding(msg: dict, api_key: string):
     openai.api_key = api_key
     embedding = get_embedding(text=msg["content"], engine="text-embedding-ada-002")
     return {"content": msg, "embedding": embedding}
-
-# def get_closest_motion(response: string, motions: list):
-
 
 def clean_response(response: string):
     # delete the nonsense at the beginning of the response
@@ -167,7 +168,7 @@ def clean_response(response: string):
     return response
 
 
-def seperate_response(response: string):
+def seperate_response(response: string, charaSet: dict):
     response_list = []
     # seperate the response into a list of strings by contents in brackets
     while True:
@@ -183,7 +184,33 @@ def seperate_response(response: string):
             content_after = response[right + 1 :]
             if not content_before in ["", "\n", " ", '"']:
                 response_list.append({"type": "text", "content": content_before})
+
+            # remove the character name from the motion
+            content_in = content_in.replace(charaSet["name"], "")
             response_list.append({"type": "motion", "content": content_in})
             response = content_after
 
     return response_list
+
+
+def pair_response_list(response_list: list):
+    response_pairs = []
+    # pair the motion and text in the response_list together
+    for i in range(0, len(response_list), 2):
+        if i == len(response_list) - 1:
+            if response_list[i]["type"] == "motion":
+                motion = response_list[i]["content"]
+                response_pairs.append({"motion": motion, "text": ""})
+            else:
+                text = response_list[i]["content"]
+                response_pairs.append({"motion": "", "text": text})
+            break
+        if response_list[i]["type"] == "motion":
+            motion = response_list[i]["content"]
+            text = response_list[i + 1]["content"]
+            response_pairs.append({"motion": motion, "text": text})
+        else:
+            motion = response_list[i + 1]["content"]
+            text = response_list[i]["content"]
+            response_pairs.append({"motion": motion, "text": text})
+    return response_pairs
