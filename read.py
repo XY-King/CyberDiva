@@ -29,36 +29,32 @@ def embed_chara(name: string, api_key: string):
     charaInit = json.load(open(f"characters/{name}.json", "rb"))
     openai.api_key = api_key
 
-    # get the embeddings for the sayings and the story
-    saying_embeddings = get_embeddings(
-        list_of_text=charaInit["sayings"], engine="text-embedding-ada-002"
-    )
-    story_embeddings = get_embeddings(
-        list_of_text=charaInit["story"], engine="text-embedding-ada-002"
-    )
+    # get the keys in the charaInit
+    keys = list(charaInit.keys())
+    # get all the keys where the value is a list
+    for key in keys:
+        if not isinstance(charaInit[key], list):
+            keys.remove(key)
 
-    # make the json file of the character with the embeddings
-    sayings_embedded = []
-    for i in range(len(charaInit["sayings"])):
-        embedding = saying_embeddings[i]
-        sayings_embedded.append(
-            {"content": charaInit["sayings"][i], "embedding": embedding}
-        )
-
-    story_embedded = []
-    for i in range(len(charaInit["story"])):
-        embedding = story_embeddings[i]
-        story_embedded.append(
-            {"content": charaInit["story"][i], "embedding": embedding}
-        )
+    embedded_values = []
+    # get the embeddings for the values of the keys
+    for key in keys:
+        values = charaInit[key]
+        embeddings = get_embeddings(list_of_text=values, engine="text-embedding-ada-002")
+        done_values = {"key": key, "values": []}
+        for i in range(len(values)):
+            done_values["values"].append({"content": values[i], "embedding": embeddings[i]})
+        embedded_values.append(done_values)
 
     # change the "is_embedded" to True
     charaInit["is_embedded"] = True
     with open(f"characters/{name}.json", "w", encoding="UTF-8") as f:
         json.dump(charaInit, f, ensure_ascii=False, indent=4)
     # output the json file with embeddings
-    charaInit["sayings"] = sayings_embedded
-    charaInit["story"] = story_embedded
+    for embedded_value in embedded_values:
+        key = embedded_value["key"]
+        values = embedded_value["values"]
+        charaInit[key] = values
     with open(f"characters/{name}_embedded.json", "w", encoding="UTF-8") as f:
         json.dump(charaInit, f, ensure_ascii=False, indent=4)
 
