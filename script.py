@@ -34,7 +34,7 @@ def main():
             core.user_input(user_input)
             response = core.get_response()
             reaction_list = core.add_response(response=response)
-            # core.trigger_live2d(reaction_list)
+            core.trigger_live2d(reaction_list)
 
 if __name__ == "__main__":
     main()

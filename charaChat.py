@@ -7,6 +7,7 @@ from prompts import (
     filter_info_points,
     combine_sayings,
 )
+from read import get_chara_setting_keys
 import openai
 from openai.embeddings_utils import get_embedding
 import os
@@ -25,33 +26,28 @@ class CharaChat(Chat):
 
     def get_filtered_setting(self, input: string):
         TOTAL_LENGTH = 10000
-        self.filtered_setting = []
+        self.filtered_setting = {}
         # get the keys in the charaInit for character setting
-        keys = []
-        for key in self.chara.keys():
-            if type(self.chara[key]) is list:
-                keys.append(key)
+        keys = get_chara_setting_keys(self.chara["name"])
         # allocate the number of sayings to be filtered for each key
         values_total_length = 0
         for key in keys:
-            average_length = self.chara[key][0]["average_length"]
-            values_total_length += average_length * len(self.chara[key])
+            for value in self.chara[key]:
+                values_total_length += len(value["content"])
         # filter the settings
         for key in keys:
             values = self.chara[key]
             filter_num = int(
                 TOTAL_LENGTH
-                * (len(values) * values[0]["average_length"] / values_total_length)
+                * (len(values) / values_total_length)
             )
             filtered_values = filter_sayings(
-                sayings=values[1:],  # the first value is the average length
+                sayings=values, 
                 input=input,
                 api_key=self.setting["api_key"],
                 num=filter_num,
             )
-            self.filtered_setting.append(
-                {"key": key, "values": combine_sayings(filtered_values)}
-            )
+            self.filtered_setting[key] = combine_sayings(filtered_values)
 
     def user_input(self, input: string):
         self.get_filtered_setting(input)
@@ -180,6 +176,8 @@ def clean_response(response: string):
         if not response[i] in ["\n", " ", '"']:
             response = response[: i + 1]
             break
+    # clear all the \" in the response
+    response = response.replace('\"', "")
     return response
 
 

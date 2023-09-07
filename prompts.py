@@ -35,13 +35,19 @@ def filter_sayings(
 
 
 # combine a list of sayings with embeddings into one string
-def combine_sayings(sayings: list):
+def combine_sayings(sayings: list, with_quotation = True):
     result = "    "
     for i, saying in enumerate(sayings):
-        if i == len(sayings) - 1:
-            result += saying["content"] + "\n"
+        if with_quotation:
+            if i == len(sayings) - 1:
+                result += f"\"{saying['content']}\"\n"
+            else:
+                result += f"\"{saying['content']}\"\n    "
         else:
-            result += saying["content"] + "\n    "
+            if i == len(sayings) - 1:
+                result += f"{saying['content']}\n"
+            else:
+                result += f"{saying['content']}\n    "
     return result
 
 
@@ -85,7 +91,7 @@ def filter_info_points(
     for info in filtered_info:
         if info == "":
             filtered_info.remove(info)
-    done_info = combine_sayings(filtered_info)
+    done_info = combine_sayings(filtered_info, with_quotation=False)
     return done_info
 
 def combine_settings(filtered_setting: dict):
@@ -205,7 +211,7 @@ def get_tone_prompts(
     
 In the story, there are two imaginary characters. 
     
-The first character is {charaSet['name']}.
+The first character is {charaSet['name']}. {writer} considers the thinking and speaking patterns, character and traits of {charaSet['name']} by writing the following at first:
 
 {chara_settings}
 
@@ -222,13 +228,13 @@ Here is the conversation:
 Then, this is what {userSet['name']} express:\n
 {history[-1]['content']['content']}
 
-By considering {charaSet['name']}'s traits and the dialogue's content, {writer} considered these information points that {charaSet['name']} may want to express in {charaSet['name']}'s response:
+By considering {charaSet['name']}'s thinking patterns, traits and the dialogue's content, {writer} considered these information points that {charaSet['name']} may want to express in {charaSet['name']}'s response:
 {info_points}
 
 In the story, {writer} will put all the character's thoughts and actions between brackets []. He will put actions at every necessary interval to make the story more immersive. The script texts between each two actions should be short and expressive. {charaSet['name']} will not only express him/herself towards {userSet['name']}, but also expressing his/her own ideas actively.
 
-{writer} now writes how {charaSet['name']} would express these points in {charaSet['name']}'s tone in {setting['language']}:
-"    
+{writer} now writes how {charaSet['name']} would express these points in {charaSet['name']}'s tone and speaking patterns in {setting['language']}:
+{charaSet['name']}: 
 """
-
+    print(result)
     return result

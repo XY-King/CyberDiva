@@ -4,6 +4,13 @@ import openai
 import os
 from openai.embeddings_utils import get_embeddings, get_embedding
 
+def get_chara_setting_keys(name: string):
+    charaInit = json.load(open(f"characters/{name}.json", "rb"))
+    keys = []
+    for key in charaInit.keys():
+        if type(charaInit[key]) is list:
+            keys.append(key)
+    return keys
 
 def get_chara_config(api_key: string):
     # get character setting
@@ -30,10 +37,7 @@ def embed_chara(name: string, api_key: string):
     openai.api_key = api_key
 
     # get all the keys where the value is a list but not a string
-    keys = []
-    for key in charaInit.keys():
-        if type(charaInit[key]) is list:
-            keys.append(key)
+    keys = get_chara_setting_keys(name)
 
     embedded_values = []
     # get the embeddings for the values of the keys
@@ -41,12 +45,6 @@ def embed_chara(name: string, api_key: string):
         values = charaInit[key]
         embeddings = get_embeddings(list_of_text=values, engine="text-embedding-ada-002")
         done_values = {"key": key, "values": []}
-        # get the average length of the values
-        total_length = 0
-        for value in values:
-            total_length += len(value)
-        average_length = total_length / len(values)
-        done_values["values"].append({"average_length": average_length})
         # make the json of the values with the embeddings
         for i in range(len(values)):
             done_values["values"].append({"content": values[i], "embedding": embeddings[i]})
