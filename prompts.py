@@ -88,14 +88,19 @@ def filter_info_points(
     done_info = combine_sayings(filtered_info)
     return done_info
 
+def combine_settings(filtered_setting: dict):
+    chara_settings = ""
+    for key in filtered_setting.keys():
+        chara_settings += f"Character {key}:\n{filtered_setting[key]}\n\n"
+    return chara_settings
+
 
 # PROMPTS FUNCTIONS
 
 
 def get_intro_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
     # preperation
-    sayings = combine_sayings(filtered_setting["sayings"])
-    story = combine_sayings(filtered_setting["story"])
+    chara_settings = combine_settings(filtered_setting=filtered_setting)
 
     # prompts
     chara = f"""You are a master of the craft of writing scripts, possessing the ability to expertly delve into the mindscape of any imaginary character. Your task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. You'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, I need your unique skill set to help me breathe life into my scripts for a story. I need you to simulate and portray the inner world and ideas of a character in my story. Immerse yourself into the character, and remember we're aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a normal description.
@@ -106,11 +111,7 @@ The first imaginary character is as follows:
 
 Character name: {charaSet["name"]}
 
-Character sayings: 
-{sayings}
-
-Character story:
-{story}
+{chara_settings}
     """
 
     user = f"""The second imaginary character is as follows:
@@ -180,8 +181,7 @@ def get_tone_prompts(
 ):
     # preperation
     writer = "Xeno"
-    sayings = combine_sayings(filtered_setting["sayings"])
-    story = combine_sayings(filtered_setting["story"])
+    chara_settings = combine_settings(filtered_setting=filtered_setting)
     history_copy = history.copy()
     history_copy.pop()
     named_history = [
@@ -207,11 +207,7 @@ In the story, there are two imaginary characters.
     
 The first character is {charaSet['name']}.
 
-Sayings of {charaSet['name']}:
-{sayings}
-
-Story of {charaSet['name']}:
-{story}
+{chara_settings}
 
 The second character is {userSet['name']}.
 Character setting of {userSet['name']}:

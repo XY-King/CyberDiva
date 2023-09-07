@@ -5,6 +5,7 @@ from prompts import (
     get_tone_prompts,
     filter_sayings,
     filter_info_points,
+    combine_sayings,
 )
 import openai
 from openai.embeddings_utils import get_embedding
@@ -23,20 +24,34 @@ class CharaChat(Chat):
         self.filtered_setting = []
 
     def get_filtered_setting(self, input: string):
-        filtered_saying = filter_sayings(
-            sayings=self.chara["sayings"],
-            input=input,
-            api_key=self.setting["api_key"],
-            num=20,
-        )
-        filtered_story = filter_sayings(
-            sayings=self.chara["story"],
-            input=input,
-            api_key=self.setting["api_key"],
-            num=2,
-        )
-
-        self.filtered_setting = {"sayings": filtered_saying, "story": filtered_story}
+        TOTAL_LENGTH = 10000
+        self.filtered_setting = []
+        # get the keys in the charaInit for character setting
+        keys = []
+        for key in self.chara.keys():
+            if type(self.chara[key]) is list:
+                keys.append(key)
+        # allocate the number of sayings to be filtered for each key
+        values_total_length = 0
+        for key in keys:
+            average_length = self.chara[key][0]["average_length"]
+            values_total_length += average_length * len(self.chara[key])
+        # filter the settings
+        for key in keys:
+            values = self.chara[key]
+            filter_num = int(
+                TOTAL_LENGTH
+                * (len(values) * values[0]["average_length"] / values_total_length)
+            )
+            filtered_values = filter_sayings(
+                sayings=values[1:],  # the first value is the average length
+                input=input,
+                api_key=self.setting["api_key"],
+                num=filter_num,
+            )
+            self.filtered_setting.append(
+                {"key": key, "values": combine_sayings(filtered_values)}
+            )
 
     def user_input(self, input: string):
         self.get_filtered_setting(input)
@@ -94,7 +109,9 @@ class CharaChat(Chat):
                 self.setting["api_key"],
             )
         )
-        return pair_response_list(response_list=seperate_response(tone_text, self.chara))
+        return pair_response_list(
+            response_list=seperate_response(tone_text, self.chara)
+        )
 
     def print_history(self):
         os.system("cls")
@@ -140,12 +157,9 @@ class CharaChat(Chat):
                 )[0]["content"]
             else:
                 motion = ""
-            loop.run_until_complete(
-                send_message(motion, response["text"])
-            )
+            loop.run_until_complete(send_message(motion, response["text"]))
             sleep_time = 0.1 * len(response["text"])
             loop.run_until_complete(asyncio.sleep(sleep_time))
-            
 
 
 # HELPER FUNCTIONS
@@ -153,6 +167,7 @@ def with_embedding(msg: dict, api_key: string):
     openai.api_key = api_key
     embedding = get_embedding(text=msg["content"], engine="text-embedding-ada-002")
     return {"content": msg, "embedding": embedding}
+
 
 def clean_response(response: string):
     # delete the nonsense at the beginning of the response

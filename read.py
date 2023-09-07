@@ -29,12 +29,11 @@ def embed_chara(name: string, api_key: string):
     charaInit = json.load(open(f"characters/{name}.json", "rb"))
     openai.api_key = api_key
 
-    # get the keys in the charaInit
-    keys = list(charaInit.keys())
-    # get all the keys where the value is a list
-    for key in keys:
-        if not isinstance(charaInit[key], list):
-            keys.remove(key)
+    # get all the keys where the value is a list but not a string
+    keys = []
+    for key in charaInit.keys():
+        if type(charaInit[key]) is list:
+            keys.append(key)
 
     embedded_values = []
     # get the embeddings for the values of the keys
@@ -42,6 +41,13 @@ def embed_chara(name: string, api_key: string):
         values = charaInit[key]
         embeddings = get_embeddings(list_of_text=values, engine="text-embedding-ada-002")
         done_values = {"key": key, "values": []}
+        # get the average length of the values
+        total_length = 0
+        for value in values:
+            total_length += len(value)
+        average_length = total_length / len(values)
+        done_values["values"].append({"average_length": average_length})
+        # make the json of the values with the embeddings
         for i in range(len(values)):
             done_values["values"].append({"content": values[i], "embedding": embeddings[i]})
         embedded_values.append(done_values)
