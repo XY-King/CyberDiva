@@ -239,7 +239,4 @@ To write {charaSet['name']}'s response vividly, {writer} considers the tone and 
 {charaSet['name']}: 
 """
 
-    #outputs the prompt to a file
-    with open("prompt.txt", "w", encoding="UTF-8") as f:
-        f.write(result)
     return result
