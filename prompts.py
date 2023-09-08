@@ -187,6 +187,7 @@ def get_tone_prompts(
 ):
     # preperation
     writer = "Xeno"
+    intro = charaSet["introduction"]
     chara_settings = combine_settings(filtered_setting=filtered_setting)
     history_copy = history.copy()
     history_copy.pop()
@@ -211,30 +212,34 @@ def get_tone_prompts(
     
 In the story, there are two imaginary characters. 
     
-The first character is {charaSet['name']}. {writer} considers the thinking and speaking patterns, character and traits of {charaSet['name']} by writing the following at first:
-
-{chara_settings}
+The main character is {charaSet['name']}. 
+Character setting of {charaSet['name']}:
+{intro}
 
 The second character is {userSet['name']}.
 Character setting of {userSet['name']}:
 {userSet['setting']}
 
-{writer} is writing the scripts of a story about a daily conversation between {charaSet['name']} and {userSet['name']}, as follows. Although here is only the conversation, {writer} has already considered and written the background of the story, which is attractive, complex and long, but not shown here.
+{writer} is writing the scripts of a story about a daily conversation between {charaSet['name']} and {userSet['name']}, as follows.
+In the story, {writer} will put the character's physical actions between brackets []. Note that actions and words of the character should alternate in the script. The script texts between each two actions should be short and expressive. 
 
-Here is the conversation:
-
+Here is the conversation history:
 {done_history}
 
 Then, this is what {userSet['name']} express:\n
-{history[-1]['content']['content']}
+"{history[-1]['content']['content']}"
 
 By considering {charaSet['name']}'s thinking patterns, traits and the dialogue's content, {writer} considered these information points that {charaSet['name']} may want to express in {charaSet['name']}'s response:
 {info_points}
 
-In the story, {writer} will put all the character's thoughts and actions between brackets []. He will put actions at every necessary interval to make the story more immersive. The script texts between each two actions should be short and expressive. {charaSet['name']} will not only express him/herself towards {userSet['name']}, but also expressing his/her own ideas actively.
+To write {charaSet['name']}'s response vividly, {writer} considers the tone and way of speaking of {charaSet['name']} by the following examples:
+{chara_settings}
 
-{writer} now writes how {charaSet['name']} would express these points in {charaSet['name']}'s tone and speaking patterns in {setting['language']}:
+{writer} now writes how {charaSet['name']} would express these points in {charaSet['name']}'s tone and way of speaking in {setting['language']}:
 {charaSet['name']}: 
 """
-    print(result)
+
+    #outputs the prompt to a file
+    with open("prompt.txt", "w", encoding="UTF-8") as f:
+        f.write(result)
     return result

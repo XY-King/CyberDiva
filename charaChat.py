@@ -14,6 +14,7 @@ import os
 import json
 import asyncio
 import websockets
+import time
 
 
 class CharaChat(Chat):
@@ -25,7 +26,7 @@ class CharaChat(Chat):
         self.filtered_setting = []
 
     def get_filtered_setting(self, input: string):
-        TOTAL_LENGTH = 10000
+        TOTAL_LENGTH = 5000
         self.filtered_setting = {}
         # get the keys in the charaInit for character setting
         keys = get_chara_setting_keys(self.chara["name"])
@@ -50,6 +51,7 @@ class CharaChat(Chat):
             self.filtered_setting[key] = combine_sayings(filtered_values)
 
     def user_input(self, input: string):
+        start_time = time.time()
         self.get_filtered_setting(input)
 
         init_msg = get_begin_prompts(
@@ -69,14 +71,18 @@ class CharaChat(Chat):
         self.real_history.append(
             with_embedding({"role": "user", "content": input}, self.setting["api_key"])
         )
+        print("user_input: " + str(time.time() - start_time))
 
     def add_response(self, response: string):
+        start_time = time.time()
         response = filter_info_points(
             info_points=response,
             input=self.history[-1]["content"],
             api_key=self.setting["api_key"],
             charaSet=self.chara,
         )
+        print("filter_info_points: " + str(time.time() - start_time))
+        start_time = time.time()
         tone_response = openai.Completion.create(
             model="text-davinci-003",
             prompt=get_tone_prompts(
@@ -90,6 +96,7 @@ class CharaChat(Chat):
             ),
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
+            presence_penalty=self.setting["presence_penalty"],
         )
 
         tone_text = tone_response["choices"][0]["text"]
@@ -105,12 +112,13 @@ class CharaChat(Chat):
                 self.setting["api_key"],
             )
         )
+        print("add_response: " + str(time.time() - start_time))
         return pair_response_list(
             response_list=seperate_response(tone_text, self.chara)
         )
 
     def print_history(self):
-        os.system("cls")
+        # os.system("cls")
         for _msg in self.real_history:
             msg = _msg["content"]
             if msg["role"] == "user":

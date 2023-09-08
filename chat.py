@@ -1,6 +1,7 @@
 import openai
 import string
 import os
+import time
 
 class Chat:
     def __init__(self, setting : dict):
@@ -12,6 +13,7 @@ class Chat:
         self.history.append(input_msg)
 
     def get_response(self):
+        start_time = time.time()
         openai.api_key = self.setting["api_key"]
         response = openai.ChatCompletion.create(
             model=self.setting["model"],
@@ -19,6 +21,7 @@ class Chat:
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
         )
+        print("get_response: " + str(time.time() - start_time))
         return response.choices[0]["message"]["content"]
     
     def add_response(self, response: string):
