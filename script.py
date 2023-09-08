@@ -8,6 +8,12 @@ def get_config_id():
         return "my_config.json"
     else:
         return "config.json"
+    
+def get_user_id():
+    if os.path.exists("my_user.json"):
+        return "my_user.json"
+    else:
+        return "user.json"
 
 def main():
     config_id = get_config_id()
@@ -18,7 +24,7 @@ def main():
         return
 
     charaSet = get_chara_config(chatSet["api_key"])
-    userSet = json.load(open("user.json", "rb"))
+    userSet = json.load(open(get_user_id(), "rb"))
     core = CharaChat(chatSet=chatSet, charaSet=charaSet, userSet=userSet)
     while True:
         core.print_history()
