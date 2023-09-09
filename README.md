@@ -1,7 +1,21 @@
 # Re_CharacterAI
 A New-era implementation of interaction between human and imaginary characters.
 
-## Preperation before running
+## Running sample character
+### Configuration
+- fill in your openai api key in the `api_key` field in `config.json`
+- fill in your nickname (for the character to call you) and setting of yourself (imagined relationship with the character) in `user.json`.
+### Live2D setup
+- install `Live2DViewerEX` on your computer via Steam
+- open `Live2DViewerEX`, click `File` -> `Import Model Data` -> `Import Model Data (JSON)`. Use the `model.json` file in `live2d/shirokane_rinko/`. Then, switch to this character.
+- toggle the `Remote access`-`Start service` switch in `Live2DViewerEX` to `ON`.
+### Run
+- Open a command line window under the root directory of this project
+- run `python script.py`
+- start chatting with the character! You will type in the command line window and see the response in the Live2D window
+- type `exit` to exit the conversation
+
+## How to create your own character
 ## CONFIGURATION
 ### OpenAI settings
 - fill in your openai api key in the `api_key` field in `config.json`
