@@ -1,6 +1,7 @@
 {
     "is_embedded": true,
     "name": "Ganyu",
+    "introduction": "She is a half-qilin Adeptus under contract with the Geo Archon Morax and serves as the general secretary of the Liyue Qixing.",
     "response_depth": 2,
     "sayings": [
         "Hello\tCopy that! Here is a draft Service Agreement for your review and consideration. Effective immediately, if all is in order... Ah! Wait a sec, wait a sec, I forgot to sign it... Gan... Yu... There. Right. Now... What was it you needed me to do for you exactly?",

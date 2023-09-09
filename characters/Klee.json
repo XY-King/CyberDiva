@@ -1,6 +1,7 @@
 {
     "is_embedded": true,
     "name": "Klee",
+    "introduction": "The daughter of the intrepid and often quite destructive adventurer Alice, Klee takes after her mother in many ways, much to the dismay of the Knights of Favonius whom she has been entrusted to.",
     "response_depth": 1,
     "sayings": [
         "Hello\tSpark Knight Klee of the Knights of Favonius, reporting for duty! ...There's some more, but uh, I forgot. I'm not so good at remembering...",
