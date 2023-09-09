@@ -1,6 +1,6 @@
 import json
 from charaChat import CharaChat
-from read import get_chara_config
+from read import get_chara_config, get_user_config
 import os 
 
 def get_config_id():
@@ -24,7 +24,7 @@ def main():
         return
 
     charaSet = get_chara_config(chatSet["api_key"])
-    userSet = json.load(open(get_user_id(), "rb"))
+    userSet = get_user_config(get_user_id(), charaSet["name"])
     core = CharaChat(chatSet=chatSet, charaSet=charaSet, userSet=userSet)
     while True:
         core.print_history()

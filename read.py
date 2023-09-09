@@ -1,10 +1,9 @@
 import json
-import string
 import openai
 import os
 from openai.embeddings_utils import get_embeddings, get_embedding
 
-def get_chara_setting_keys(name: string):
+def get_chara_setting_keys(name: str):
     charaInit = json.load(open(f"characters/{name}.json", "rb"))
     keys = []
     for key in charaInit.keys():
@@ -12,7 +11,7 @@ def get_chara_setting_keys(name: string):
             keys.append(key)
     return keys
 
-def get_chara_config(api_key: string):
+def get_chara_config(api_key: str):
     # get character setting
     name = json.load(open("chara.json", "rb"))["name"]
     is_embedded = json.load(open(f"characters/{name}.json", "rb"))["is_embedded"]
@@ -32,7 +31,7 @@ def get_chara_config(api_key: string):
 
 
 # make the sayings of the character into embeddings
-def embed_chara(name: string, api_key: string):
+def embed_chara(name: str, api_key: str):
     charaInit = json.load(open(f"characters/{name}.json", "rb"))
     openai.api_key = api_key
 
@@ -63,7 +62,7 @@ def embed_chara(name: string, api_key: string):
         json.dump(charaInit, f, ensure_ascii=False, indent=4)
 
 
-def embed_live2d_motions(live2d_name: string, api_key: string):
+def embed_live2d_motions(live2d_name: str, api_key: str):
     # if the motions_embedded.json file exists, then return
     if os.path.exists(f"live2d/{live2d_name}/motions_embedded.json"):
         return
@@ -89,3 +88,10 @@ def embed_live2d_motions(live2d_name: string, api_key: string):
     # output the json file with embeddings
     with open(f"live2d/{live2d_name}/motions_embedded.json", "w", encoding="UTF-8") as f:
         json.dump(motions_embedded, f, ensure_ascii=False, indent=4)
+
+def get_user_config(id: str, chara_name: str):
+    userInit = json.load(open(id, "rb"))
+    setting = userInit["setting"]
+    setting = setting.replace("CHARACTER", chara_name)
+    userInit["setting"] = setting
+    return userInit
