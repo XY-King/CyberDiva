@@ -38,12 +38,9 @@ class CharaChat(Chat):
         # filter the settings
         for key in keys:
             values = self.chara[key]
-            filter_num = int(
-                TOTAL_LENGTH
-                * (len(values) / values_total_length)
-            )
+            filter_num = int(TOTAL_LENGTH * (len(values) / values_total_length))
             filtered_values = filter_sayings(
-                sayings=values, 
+                sayings=values,
                 input=input,
                 api_key=self.setting["api_key"],
                 num=filter_num,
@@ -114,7 +111,9 @@ class CharaChat(Chat):
         )
         print("add_response: " + str(time.time() - start_time))
         return pair_response_list(
-            response_list=seperate_response(tone_text, self.chara)
+            response_list=seperate_response(tone_text, self.chara),
+            chara_motions=self.chara["motions"],
+            api_key=self.setting["api_key"],
         )
 
     def print_history(self):
@@ -185,7 +184,7 @@ def clean_response(response: string):
             response = response[: i + 1]
             break
     # clear all the \" in the response
-    response = response.replace('\"', "")
+    response = response.replace('"', "")
     return response
 
 
@@ -214,24 +213,33 @@ def seperate_response(response: string, charaSet: dict):
     return response_list
 
 
-def pair_response_list(response_list: list):
+def pair_response_list(response_list: list, chara_motions: list, api_key: string):
+    def get_motion(motion: string):
+        motion = filter_sayings(
+            sayings=chara_motions,
+            input=motion,
+            api_key=api_key,
+            num=1,
+        )[0]["content"]
+        return motion
+
     response_pairs = []
     # pair the motion and text in the response_list together
     for i in range(0, len(response_list), 2):
         if i == len(response_list) - 1:
             if response_list[i]["type"] == "motion":
-                motion = response_list[i]["content"]
+                motion = get_motion(response_list[i]["content"])
                 response_pairs.append({"motion": motion, "text": ""})
             else:
                 text = response_list[i]["content"]
                 response_pairs.append({"motion": "", "text": text})
             break
         if response_list[i]["type"] == "motion":
-            motion = response_list[i]["content"]
+            motion = get_motion(response_list[i]["content"])
             text = response_list[i + 1]["content"]
             response_pairs.append({"motion": motion, "text": text})
         else:
-            motion = response_list[i + 1]["content"]
+            motion = get_motion(response_list[i + 1]["content"])
             text = response_list[i]["content"]
             response_pairs.append({"motion": motion, "text": text})
     return response_pairs

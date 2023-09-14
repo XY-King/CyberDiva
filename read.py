@@ -24,7 +24,7 @@ def get_chara_config(api_key: str):
     # get live2d setting
     live2d_name = json.load(open("chara.json", "rb"))["live2d"]
     embed_live2d_motions(live2d_name, api_key)
-    with open(f"live2d/{live2d_name}/motions_embedded.json", "rb") as f:
+    with open(f"static/live2d/{live2d_name}/motions_embedded.json", "rb") as f:
         live2d_motions = json.load(f)
     charaSet["motions"] = live2d_motions
     return charaSet
@@ -64,11 +64,11 @@ def embed_chara(name: str, api_key: str):
 
 def embed_live2d_motions(live2d_name: str, api_key: str):
     # if the motions_embedded.json file exists, then return
-    if os.path.exists(f"live2d/{live2d_name}/motions_embedded.json"):
+    if os.path.exists(f"static/live2d/{live2d_name}/motions_embedded.json"):
         return
 
     # get the motions
-    live2d_model = json.load(open(f"live2d/{live2d_name}/model.json", "rb"))
+    live2d_model = json.load(open(f"static/live2d/{live2d_name}/model.json", "rb"))
     live2d_motions = live2d_model["motions"]
     # get all the keys of the motions and transform it into a list
     live2d_motions = list(live2d_motions.keys())
@@ -86,7 +86,7 @@ def embed_live2d_motions(live2d_name: str, api_key: str):
             {"content": live2d_motions[i], "embedding": embedding}
         )
     # output the json file with embeddings
-    with open(f"live2d/{live2d_name}/motions_embedded.json", "w", encoding="UTF-8") as f:
+    with open(f"static/live2d/{live2d_name}/motions_embedded.json", "w", encoding="UTF-8") as f:
         json.dump(motions_embedded, f, ensure_ascii=False, indent=4)
 
 def get_user_config(id: str, chara_name: str):
