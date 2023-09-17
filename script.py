@@ -4,23 +4,8 @@ from read import get_chara_config, get_user_config, get_api_key
 import os
 from flask import Flask, request, render_template
 
-
-def get_key_id():
-    if os.path.exists("my_key.json"):
-        return "my_key.json"
-    else:
-        return "key.json"
-
-
-def get_user_id():
-    if os.path.exists("my_user.json"):
-        return "my_user.json"
-    else:
-        return "user.json"
-
-
 app = Flask(__name__)
-get_api_key(get_key_id())
+get_api_key()
 
 
 @app.route("/")
@@ -29,7 +14,7 @@ def index():
 
     chatSet = json.load(open("config.json", "rb"))
     charaSet = get_chara_config()
-    userSet = get_user_config(get_user_id(), charaSet["name"])
+    userSet = get_user_config(charaSet["name"])
     core = CharaChat(chatSet=chatSet, charaSet=charaSet, userSet=userSet)
 
     return render_template("index.html")

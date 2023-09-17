@@ -87,15 +87,25 @@ def embed_live2d_motions(live2d_name: str):
     with open(f"static/live2d/{live2d_name}/motions_embedded.json", "w", encoding="UTF-8") as f:
         json.dump(motions_embedded, f, ensure_ascii=False, indent=4)
 
-def get_user_config(id: str, chara_name: str):
+def get_user_config(chara_name: str):
+    if os.path.exists("my_user.json"):
+        id = "my_user.json"
+    else:
+        id = "user.json"
+    
     userInit = json.load(open(id, "rb"))
     setting = userInit["setting"]
     setting = setting.replace("CHARACTER", chara_name)
     userInit["setting"] = setting
     return userInit
 
-def get_api_key(config_id: str):
-    api_key_setting = json.load(open(config_id, "rb"))
+def get_api_key():
+    if os.path.exists("my_key.json"):
+        key_id = "my_key.json"
+    else:
+        key_id = "key.json"
+
+    api_key_setting = json.load(open(key_id, "rb"))
 
     key_id = api_key_setting["API_KEY_ID"]
     key = api_key_setting["API_KEYS"][key_id]
