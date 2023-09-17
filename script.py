@@ -1,17 +1,15 @@
 import json
 from charaChat import CharaChat
-from read import get_chara_config, get_user_config
+from read import get_chara_config, get_user_config, get_api_key
 import os
 from flask import Flask, request, render_template
 
-app = Flask(__name__)
 
-
-def get_config_id():
-    if os.path.exists("my_config.json"):
-        return "my_config.json"
+def get_key_id():
+    if os.path.exists("my_key.json"):
+        return "my_key.json"
     else:
-        return "config.json"
+        return "key.json"
 
 
 def get_user_id():
@@ -21,16 +19,16 @@ def get_user_id():
         return "user.json"
 
 
+app = Flask(__name__)
+get_api_key(get_key_id())
+
+
 @app.route("/")
 def index():
     global chatSet, charaSet, userSet, core
 
-    config_id = get_config_id()
-    chatSet = json.load(open(config_id, "rb"))
-    if chatSet["api_key"] == "YOUR_API_KEY":
-        return {"error": "Please set your API key in config.json"}
-
-    charaSet = get_chara_config(chatSet["api_key"])
+    chatSet = json.load(open("config.json", "rb"))
+    charaSet = get_chara_config()
     userSet = get_user_config(get_user_id(), charaSet["name"])
     core = CharaChat(chatSet=chatSet, charaSet=charaSet, userSet=userSet)
 

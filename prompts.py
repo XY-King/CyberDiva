@@ -7,9 +7,8 @@ from openai.embeddings_utils import get_embedding, cosine_similarity, get_embedd
 
 # filter the sayings by the relation with the input and return the top {num} sayings
 def filter_sayings(
-    sayings: list, input: string, api_key: string, num: int, is_stable: bool = False
+    sayings: list, input: str, num: int, is_stable: bool = False
 ):
-    openai.api_key = api_key
     input_embedding = get_embedding(text=input, engine="text-embedding-ada-002")
     sayings_relation = []
     for saying in sayings:
@@ -62,7 +61,7 @@ def name_embedded_msg(charaSet: dict, userSet: dict, msg: dict):
 
 
 def filter_info_points(
-    info_points: string, input: string, api_key: string, charaSet: dict
+    info_points: str, input: str, charaSet: dict
 ):
     # delete the nonsense at the beginning
     for i in range(len(info_points)):
@@ -84,7 +83,6 @@ def filter_info_points(
     filtered_info = filter_sayings(
         sayings=info_embedded,
         input=input,
-        api_key=api_key,
         num=charaSet["response_depth"],
         is_stable=True,
     )
@@ -183,7 +181,6 @@ def get_tone_prompts(
     history: list,
     info_points: string,
     filtered_setting: dict,
-    api_key: string,
 ):
     # preperation
     writer = "Xeno"
@@ -198,7 +195,6 @@ def get_tone_prompts(
     filtered_history = filter_sayings(
         sayings=named_history,
         input=history[-1]["content"]["content"],
-        api_key=api_key,
         num=20,
         is_stable=True,
     )

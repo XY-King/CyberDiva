@@ -11,19 +11,19 @@ def get_chara_setting_keys(name: str):
             keys.append(key)
     return keys
 
-def get_chara_config(api_key: str):
+def get_chara_config():
     # get character setting
     name = json.load(open("chara.json", "rb"))["name"]
     is_embedded = json.load(open(f"characters/{name}.json", "rb"))["is_embedded"]
 
     if not is_embedded:
-        embed_chara(name, api_key)
+        embed_chara(name)
 
     charaSet = json.load(open(f"characters/{name}_embedded.json", "rb"))
 
     # get live2d setting
     live2d_name = json.load(open("chara.json", "rb"))["live2d"]
-    embed_live2d_motions(live2d_name, api_key)
+    embed_live2d_motions(live2d_name)
     with open(f"static/live2d/{live2d_name}/motions_embedded.json", "rb") as f:
         live2d_motions = json.load(f)
     charaSet["motions"] = live2d_motions
@@ -31,9 +31,8 @@ def get_chara_config(api_key: str):
 
 
 # make the sayings of the character into embeddings
-def embed_chara(name: str, api_key: str):
+def embed_chara(name: str):
     charaInit = json.load(open(f"characters/{name}.json", "rb"))
-    openai.api_key = api_key
 
     # get all the keys where the value is a list but not a string
     keys = get_chara_setting_keys(name)
@@ -62,7 +61,7 @@ def embed_chara(name: str, api_key: str):
         json.dump(charaInit, f, ensure_ascii=False, indent=4)
 
 
-def embed_live2d_motions(live2d_name: str, api_key: str):
+def embed_live2d_motions(live2d_name: str):
     # if the motions_embedded.json file exists, then return
     if os.path.exists(f"static/live2d/{live2d_name}/motions_embedded.json"):
         return
@@ -74,7 +73,6 @@ def embed_live2d_motions(live2d_name: str, api_key: str):
     live2d_motions = list(live2d_motions.keys())
 
     # embed the motions
-    openai.api_key = api_key
     motion_embeddings = get_embeddings(
         list_of_text=live2d_motions, engine="text-embedding-ada-002"
     )
@@ -95,3 +93,14 @@ def get_user_config(id: str, chara_name: str):
     setting = setting.replace("CHARACTER", chara_name)
     userInit["setting"] = setting
     return userInit
+
+def get_api_key(config_id: str):
+    api_key_setting = json.load(open(config_id, "rb"))
+
+    key_id = api_key_setting["API_KEY_ID"]
+    key = api_key_setting["API_KEYS"][key_id]
+
+    openai.api_key = key["API_KEY"]
+    if "API_TYPE" in key:
+        openai.api_type = key["API_TYPE"]
+        

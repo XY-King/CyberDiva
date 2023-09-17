@@ -42,7 +42,6 @@ class CharaChat(Chat):
             filtered_values = filter_sayings(
                 sayings=values,
                 input=input,
-                api_key=self.setting["api_key"],
                 num=filter_num,
             )
             self.filtered_setting[key] = combine_sayings(filtered_values)
@@ -66,7 +65,7 @@ class CharaChat(Chat):
                 self.history[i] = msg
         super().user_input(named_input)
         self.real_history.append(
-            with_embedding({"role": "user", "content": input}, self.setting["api_key"])
+            with_embedding({"role": "user", "content": input})
         )
         print("user_input: " + str(time.time() - start_time))
 
@@ -75,7 +74,6 @@ class CharaChat(Chat):
         response = filter_info_points(
             info_points=response,
             input=self.history[-1]["content"],
-            api_key=self.setting["api_key"],
             charaSet=self.chara,
         )
         print("filter_info_points: " + str(time.time() - start_time))
@@ -89,7 +87,6 @@ class CharaChat(Chat):
                 history=self.real_history,
                 info_points=response,
                 filtered_setting=self.filtered_setting,
-                api_key=self.setting["api_key"],
             ),
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
@@ -105,15 +102,13 @@ class CharaChat(Chat):
                 {
                     "role": "assistant",
                     "content": tone_text,
-                },
-                self.setting["api_key"],
+                }
             )
         )
         print("add_response: " + str(time.time() - start_time))
         return pair_response_list(
             response_list=seperate_response(tone_text, self.chara),
             chara_motions=self.chara["motions"],
-            api_key=self.setting["api_key"],
         )
 
     def print_history(self):
@@ -155,7 +150,6 @@ class CharaChat(Chat):
                 motion = filter_sayings(
                     sayings=self.chara["motions"],
                     input=response["motion"],
-                    api_key=self.setting["api_key"],
                     num=1,
                 )[0]["content"]
             else:
@@ -166,8 +160,7 @@ class CharaChat(Chat):
 
 
 # HELPER FUNCTIONS
-def with_embedding(msg: dict, api_key: string):
-    openai.api_key = api_key
+def with_embedding(msg: dict):
     embedding = get_embedding(text=msg["content"], engine="text-embedding-ada-002")
     return {"content": msg, "embedding": embedding}
 
@@ -213,12 +206,11 @@ def seperate_response(response: string, charaSet: dict):
     return response_list
 
 
-def pair_response_list(response_list: list, chara_motions: list, api_key: string):
+def pair_response_list(response_list: list, chara_motions: list):
     def get_motion(motion: string):
         motion = filter_sayings(
             sayings=chara_motions,
             input=motion,
-            api_key=api_key,
             num=1,
         )[0]["content"]
         return motion

@@ -1,0 +1,12 @@
+{
+    "API_KEY_ID": "MY_KEY",
+    "API_KEYS": {
+        "MY_KEY": {
+            "API_KEY": "YOUR_API_KEY"
+        },
+        "FREE_KEY": {
+            "API_KEY": "YOUR_FREE_API_KEY",
+            "API_TYPE": "YOUR_API_TYPE"
+        }
+    }
+}

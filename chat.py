@@ -14,7 +14,6 @@ class Chat:
 
     def get_response(self):
         start_time = time.time()
-        openai.api_key = self.setting["api_key"]
         response = openai.ChatCompletion.create(
             model=self.setting["model"],
             messages=[self.setting["sys_msg"]] + self.history,
