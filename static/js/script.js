@@ -42,7 +42,7 @@ function send_input() {
                         }
                         // show message if it’s not empty
                         if (action_list[action_index].text != "") {
-                            showMessage(action_list[action_index].text, 2000);
+                            showMessage(action_list[action_index].text);
                         }
                         action_index++;
                     }
@@ -60,13 +60,25 @@ $("#user_input_form").on("submit", function (e) {
     $("#user_input").val(""); // clear the input field
 });
 
-function showMessage(text, timeout) {
+function get_message_timeout(message) {
+    // calculate how long the message should be displayed
+    var timeout = 0;
+    var a = 0.5;
+    var b = 0.05;
+    var x = message.length;
+    console.log("message length", x);
+    timeout = a * Math.log(x + 1) + b * x;
+    return timeout;
+}
+
+function showMessage(text) {
     if (Array.isArray(text))
         text = text[Math.floor(Math.random() * text.length + 1) - 1];
     //console.log('showMessage', text);
     $(".message").stop();
     $(".message").html(text).fadeTo(200, 1);
-    if (timeout === null) timeout = 5000;
+    var timeout = get_message_timeout(text) * 1000;
+    console.log("timeout", timeout);
     hideMessage(timeout);
 }
 
@@ -74,9 +86,4 @@ function hideMessage(timeout) {
     $(".message").stop().css("opacity", 1);
     if (timeout === null) timeout = 5000;
     $(".message").delay(timeout).fadeTo(200, 0);
-}
-
-function sleep(ms) {
-    var start = new Date().getTime();
-    while (new Date().getTime() < start + ms);
 }

@@ -219,6 +219,8 @@ Character setting of {userSet['name']}:
 {writer} is writing the scripts of a story about a daily conversation between {charaSet['name']} and {userSet['name']}, as follows.
 In the story, {writer} will put the character's physical actions between brackets []. Note that actions and words of the character should alternate in the script. The script texts between each two actions should be short and expressive. 
 
+Example: [Motion1]Text1[Motion2]Text2
+
 Here is the conversation history:
 {done_history}
 
