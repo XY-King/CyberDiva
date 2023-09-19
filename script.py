@@ -30,7 +30,6 @@ def chat():
     core.user_input(user_input)
     response = core.get_response()
     action_list = core.add_response(response=response)
-    # core.trigger_live2d(reaction_list)
     for reaction in action_list:
         print(reaction)
     return {"action_list": action_list}

@@ -8,7 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=0.5, minimum-scale=1.0, maximum-scale=4.0">
         </meta>
 
-        <link rel="stylesheet" href="/live2d/css/live2d.css" />
+        <link rel="stylesheet" href="../static/css/message.css" />
         <script src="../static/js/LAppDefine.js"></script>
         <script src="../static/js/live2d.min.js"></script>
         <script src="../static/js/jquery.min.js"></script>
@@ -16,35 +16,17 @@
     </head>
 
     <body onload="InitLive2D()">
-        <p>
-            <button onclick="play_motion('feel_angry')" class="active">Angry</button>
-            <button onclick="play_motion('nod')" class="active">Odoodo</button>
-            <button onclick="play_motion('sad')" class="active">Sad</button>
-        </p>
-        
         <div>
-            <div class="message" style="opacity:0"></div>
-            <canvas id="mycanvas" width="300" height="500" 
-                style="border:dashed 1px #CCC;">
-            </canvas>
+            <div class="message" style="height:60px; width:300px;">
+                <div class="message-text" style="opacity:0;"></div>
+            </div>
+            <canvas id="mycanvas" width="300" height="500" style="border:dashed 1px #CCC;"></canvas>
         </div>
 
         <form id="user_input_form" action="#">
             <input id="user_input" type="text" placeholder="Type your message..." required>
             <button type="submit">Send</button>
         </form>
-        
-        <script>
-            function play_motion(motion) {
-                var model = new LAppModel();
-                model.startAppointMotion(motion,3,0);
-            }
-            
-            function changeTexure() {
-                var model = new LAppModel();
-                model.changeTexure(1);
-            }
-        </script>
 
         <script src="../static/js/script.js"></script>
     </body>

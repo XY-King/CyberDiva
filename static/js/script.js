@@ -72,18 +72,17 @@ function get_message_timeout(message) {
 }
 
 function showMessage(text) {
-    if (Array.isArray(text))
-        text = text[Math.floor(Math.random() * text.length + 1) - 1];
-    //console.log('showMessage', text);
-    $(".message").stop();
-    $(".message").html(text).fadeTo(200, 1);
+    $(".message-text").stop();
+    $(".message-text").html(text).fadeTo(200, 1);
+    var fontSize = Math.max(24, 100 / Math.sqrt(text.length));
+    $(".message-text").css("font-size", fontSize + "px");
     var timeout = get_message_timeout(text) * 1000;
     console.log("timeout", timeout);
     hideMessage(timeout);
 }
 
 function hideMessage(timeout) {
-    $(".message").stop().css("opacity", 1);
+    $(".message-text").stop().css("opacity", 1);
     if (timeout === null) timeout = 5000;
-    $(".message").delay(timeout).fadeTo(200, 0);
+    $(".message-text").delay(timeout).fadeTo(200, 0);
 }

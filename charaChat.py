@@ -93,6 +93,18 @@ class CharaChat(Chat):
             presence_penalty=self.setting["presence_penalty"],
         )
 
+        tone_prompt = get_tone_prompts(
+                setting=self.setting,
+                charaSet=self.chara,
+                userSet=self.user,
+                history=self.real_history,
+                info_points=response,
+                filtered_setting=self.filtered_setting,
+            )
+        # output the prompt to a file
+        with open("prompt.txt", "w", encoding="UTF-8") as f:
+            f.write(tone_prompt)
+
         tone_text = tone_response["choices"][0]["text"]
         tone_text = clean_response(tone_text)
 
