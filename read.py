@@ -1,7 +1,7 @@
 import json
 import openai
 import os
-from openai.embeddings_utils import get_embeddings, get_embedding
+from config import get_embeddings, get_embedding
 
 def get_chara_setting_keys(name: str):
     charaInit = json.load(open(f"characters/{name}.json", "rb"))
@@ -32,6 +32,8 @@ def get_chara_config():
 
 # make the sayings of the character into embeddings
 def embed_chara(name: str):
+    print("embedding character data...")
+
     charaInit = json.load(open(f"characters/{name}.json", "rb"))
 
     # get all the keys where the value is a list but not a string
@@ -41,7 +43,7 @@ def embed_chara(name: str):
     # get the embeddings for the values of the keys
     for key in keys:
         values = charaInit[key]
-        embeddings = get_embeddings(list_of_text=values, engine="text-embedding-ada-002")
+        embeddings = get_embeddings(values)
         done_values = {"key": key, "values": []}
         # make the json of the values with the embeddings
         for i in range(len(values)):
@@ -59,9 +61,13 @@ def embed_chara(name: str):
         charaInit[key] = values
     with open(f"characters/{name}_embedded.json", "w", encoding="UTF-8") as f:
         json.dump(charaInit, f, ensure_ascii=False, indent=4)
+    
+    print("character data embedded")
 
 
 def embed_live2d_motions(live2d_name: str):
+    print("embedding live2d motions...")
+
     # if the motions_embedded.json file exists, then return
     if os.path.exists(f"static/live2d/{live2d_name}/motions_embedded.json"):
         return
@@ -73,9 +79,7 @@ def embed_live2d_motions(live2d_name: str):
     live2d_motions = list(live2d_motions.keys())
 
     # embed the motions
-    motion_embeddings = get_embeddings(
-        list_of_text=live2d_motions, engine="text-embedding-ada-002"
-    )
+    motion_embeddings = get_embeddings(live2d_motions)
     # make the json file of the motions with the embeddings
     motions_embedded = []
     for i in range(len(live2d_motions)): 
@@ -86,6 +90,8 @@ def embed_live2d_motions(live2d_name: str):
     # output the json file with embeddings
     with open(f"static/live2d/{live2d_name}/motions_embedded.json", "w", encoding="UTF-8") as f:
         json.dump(motions_embedded, f, ensure_ascii=False, indent=4)
+
+    print("live2d motions embedded")
 
 def get_user_config(chara_name: str):
     if os.path.exists("my_user.json"):
@@ -98,19 +104,3 @@ def get_user_config(chara_name: str):
     setting = setting.replace("CHARACTER", chara_name)
     userInit["setting"] = setting
     return userInit
-
-def get_api_key():
-    if os.path.exists("my_key.json"):
-        key_id = "my_key.json"
-    else:
-        key_id = "key.json"
-
-    api_key_setting = json.load(open(key_id, "rb"))
-
-    key_id = api_key_setting["API_KEY_ID"]
-    key = api_key_setting["API_KEYS"][key_id]
-
-    openai.api_key = key["API_KEY"]
-    if "API_TYPE" in key:
-        openai.api_type = key["API_TYPE"]
-        

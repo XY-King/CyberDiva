@@ -1,6 +1,6 @@
 import string
-import openai
-from openai.embeddings_utils import get_embedding, cosine_similarity, get_embeddings
+from openai.embeddings_utils import cosine_similarity
+from config import get_embedding, get_embeddings
 
 # HELPER FUNCTIONS
 
@@ -9,7 +9,7 @@ from openai.embeddings_utils import get_embedding, cosine_similarity, get_embedd
 def filter_sayings(
     sayings: list, input: str, num: int, is_stable: bool = False
 ):
-    input_embedding = get_embedding(text=input, engine="text-embedding-ada-002")
+    input_embedding = get_embedding(input)
     sayings_relation = []
     for saying in sayings:
         relation = cosine_similarity(input_embedding, saying["embedding"])
@@ -73,9 +73,13 @@ def filter_info_points(
     for i in range(len(info_list) - 1, -1, -1):
         if len(info_list[i]) <= 5:
             info_list.pop(i)
-    info_embeddings = get_embeddings(
-        list_of_text=info_list, engine="text-embedding-ada-002"
-    )
+    # remove the index of the info points
+    for info in info_list:
+        for i in range(len(info)):
+            if info[i] == ".":
+                info_list[info_list.index(info)] = info[i + 2:]  
+                break
+    info_embeddings = get_embeddings(info_list)
     info_embedded = []
     for i in range(len(info_list)):
         embedding = info_embeddings[i]
@@ -86,9 +90,8 @@ def filter_info_points(
         num=charaSet["response_depth"],
         is_stable=True,
     )
-    for info in filtered_info:
-        if info == "":
-            filtered_info.remove(info)
+    for i in range(len(filtered_info)):
+        filtered_info[i]["content"] = f"{i + 1}. {filtered_info[i]['content']}"
     done_info = combine_sayings(filtered_info, with_quotation=False)
     return done_info
 
@@ -201,7 +204,7 @@ def get_tone_prompts(
     if filtered_history == []:
         done_history = "There is no history yet."
     else:
-        done_history = combine_sayings(filtered_history)
+        done_history = combine_sayings(filtered_history, with_quotation=False)
 
     # prompts
     result = f"""{writer} is a master of the craft of writing scripts, possessing the ability to expertly delve into the mindscape of any imaginary character. His task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. He'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, he will breathe life into the scripts of a story. He is needed to simulate and portray the inner world and ideas of a character in a story, immerse himself into the character, and remember that he is aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a normal conversation.

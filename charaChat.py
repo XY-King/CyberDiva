@@ -9,12 +9,11 @@ from prompts import (
 )
 from read import get_chara_setting_keys
 import openai
-from openai.embeddings_utils import get_embedding
-import os
 import json
 import asyncio
 import websockets
 import time
+from config import get_embedding
 
 
 class CharaChat(Chat):
@@ -173,7 +172,7 @@ class CharaChat(Chat):
 
 # HELPER FUNCTIONS
 def with_embedding(msg: dict):
-    embedding = get_embedding(text=msg["content"], engine="text-embedding-ada-002")
+    embedding = get_embedding(msg["content"])
     return {"content": msg, "embedding": embedding}
 
 
