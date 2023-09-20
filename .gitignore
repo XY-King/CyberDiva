@@ -2,3 +2,4 @@ __pycache__/
 .vscode/
 my_user.json
 my_key.json
+prompt.txt
