@@ -158,13 +158,11 @@ def get_info_point_prompts(charaSet: dict, userSet: dict):
 
 
 def get_begin_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
-    a = get_info_point_prompts(
+    return get_info_point_prompts(
         charaSet=charaSet, userSet=userSet
     ) + get_chara_prompts(
         charaSet=charaSet, userSet=userSet, filtered_setting=filtered_setting
     )
-    print(a)
-    return a
 
 
 def get_tone_prompts(
