@@ -1,7 +1,6 @@
 import json
 from charaChat import CharaChat
 from read import get_chara_config, get_user_config
-import os
 from flask import Flask, request, render_template
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QHBoxLayout   
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -10,10 +9,9 @@ from PyQt5.QtGui import QCursor
 import threading
 from config import set_api_key
 
-
+print("starting...")
 app = Flask(__name__)
 set_api_key()
-
 
 @app.route("/")
 def index():
