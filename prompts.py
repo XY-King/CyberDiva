@@ -133,9 +133,9 @@ I will input what {userSet["name"]} says in the story's scripts, and you shall o
         {"role": "user", "content": chara},
         {
             "role": "assistant",
-            "content": f"Ok, I have fully understood the character and traits of the imaginary character {charaSet['name']}.",
+            "content": f"Ok, I have fully learnt the traits and thinking patterns of the imaginary character {charaSet['name']} from the data given.",
         },
-        {"role": "assistant", "content": user},
+        {"role": "user", "content": user},
         {
             "role": "assistant",
             "content": f"Ok, I am now going to help you write the scripts of the story by simulating the response of the imaginary character {charaSet['name']}.",
