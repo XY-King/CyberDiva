@@ -30,6 +30,31 @@ def filter_sayings(sayings: list, input: str, num: int, is_stable: bool = False)
 
     return sayings_relation
 
+# filter the history, the filter result musty have pairs of user and assistant
+def filter_history(history: list, input: str, num: int):
+    # add index to the history
+    history_copy = history.copy()
+    for i in range(len(history_copy)):
+        history_copy[i]["index"] = i
+    filtered_history = filter_sayings(
+        sayings=history,
+        input=input,
+        num=num,
+        is_stable=True,
+    )
+    result = []
+    for msg in filtered_history:
+        if msg["role"] == "user":
+            result.append(msg)
+            if not history[msg["index"] + 1] in filtered_history:
+                result.append(history[msg["index"] + 1])
+        else:
+            if not history[msg["index"] - 1] in filtered_history:
+                result.append(history[msg["index"] - 1])
+            result.append(msg)
+
+    return result
+
 
 # combine a list of sayings with embeddings into one string
 def combine_sayings(sayings: list, with_quotation=True):
@@ -183,11 +208,10 @@ def get_tone_prompts(
         name_embedded_msg(charaSet=charaSet, userSet=userSet, msg=msg)
         for msg in history_copy
     ]
-    filtered_history = filter_sayings(
+    filtered_history = filter_history(
         sayings=named_history,
         input=history[-1]["content"]["content"],
         num=20,
-        is_stable=True,
     )
     if filtered_history == []:
         done_history = "There is no history yet."
