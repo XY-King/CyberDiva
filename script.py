@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
 
         # Set the central widget
         self.setCentralWidget(centralWidget)
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
 
     def start_drag(self):
