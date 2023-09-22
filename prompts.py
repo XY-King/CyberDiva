@@ -1,86 +1,21 @@
 import string
 from openai.embeddings_utils import cosine_similarity
 from config import get_embedding, get_embeddings
+from utils import filter_sayings, filter_history, combine_sayings
+from copy import deepcopy
 
 # HELPER FUNCTIONS
 
 
-# filter the sayings by the relation with the input and return the top {num} sayings
-def filter_sayings(sayings: list, input: str, num: int, is_stable: bool = False):
-    input_embedding = get_embedding(input)
-    sayings_relation = []
-    for saying in sayings:
-        relation = cosine_similarity(input_embedding, saying["embedding"])
-        sayings_relation.append({"content": saying["content"], "relation": relation})
-
-    if not is_stable:
-        # sort the sayings by the relation from the highest to the lowest
-        sayings_relation.sort(key=lambda x: x["relation"], reverse=True)
-        # get the first {num} sayings
-        sayings_relation = sayings_relation[:num]
-    else:
-        # keep the sayings order and return the sayings with top {num} relations
-        sayings_relation_copy = sayings_relation.copy()
-        sayings_relation_copy.sort(key=lambda x: x["relation"], reverse=True)
-        sayings_relation_copy = sayings_relation_copy[:num]
-        for i, saying in enumerate(sayings_relation):
-            if not saying in sayings_relation_copy:
-                sayings_relation[i] = None
-        sayings_relation = list(filter(lambda x: x != None, sayings_relation))
-
-    return sayings_relation
-
-# filter the history, the filter result musty have pairs of user and assistant
-def filter_history(history: list, input: str, num: int):
-    # add index to the history
-    history_copy = history.copy()
-    for i in range(len(history_copy)):
-        history_copy[i]["index"] = i
-    filtered_history = filter_sayings(
-        sayings=history,
-        input=input,
-        num=num,
-        is_stable=True,
-    )
-    result = []
-    for msg in filtered_history:
-        if msg["role"] == "user":
-            result.append(msg)
-            if not history[msg["index"] + 1] in filtered_history:
-                result.append(history[msg["index"] + 1])
-        else:
-            if not history[msg["index"] - 1] in filtered_history:
-                result.append(history[msg["index"] - 1])
-            result.append(msg)
-
-    return result
-
-
-# combine a list of sayings with embeddings into one string
-def combine_sayings(sayings: list, with_quotation=True):
-    result = "    "
-    for i, saying in enumerate(sayings):
-        if with_quotation:
-            if i == len(sayings) - 1:
-                result += f"\"{saying['content']}\"\n"
-            else:
-                result += f"\"{saying['content']}\"\n    "
-        else:
-            if i == len(sayings) - 1:
-                result += f"{saying['content']}\n"
-            else:
-                result += f"{saying['content']}\n    "
-    return result
-
-
 # name a msg with embedding
 def name_embedded_msg(charaSet: dict, userSet: dict, msg: dict):
-    if msg["content"]["role"] == "user":
-        nContent = userSet["name"] + ": " + msg["content"]["content"]
+    msg_copy = deepcopy(msg)
+    if msg_copy["role"] == "user":
+        msg_copy["content"] = userSet["name"] + ": " + msg_copy["content"]
     else:
-        nContent = charaSet["name"] + ": " + msg["content"]["content"]
+        msg_copy["content"] = charaSet["name"] + ": " + msg_copy["content"]
 
-    return {"content": nContent, "embedding": msg["embedding"]}
+    return msg_copy
 
 
 def filter_info_points(info_points: str, input: str, charaSet: dict):
@@ -165,10 +100,10 @@ def get_info_point_prompts(charaSet: dict, userSet: dict):
 
     info_point_prompts = [
         f"All right. I will write the script for your story by vividly similating the inner world of the character. To guide you to output the final script, you will input the words of one character, and I will give you the information points that another character may want to express in the response.",
-        f"Ok, let's make a sample conversation to see how this will work. {userSet['name']}: Today's weather is nice.",
-        f"{charaSet['name']}: \n1. Express happiness that the weather is sunny",
-        f"{userSet['name']}: Would you like to have lunch with me?",
-        f"{charaSet['name']}: \n1. Feeling shy\n2. Asking what to have for lunch",
+        f"Ok, let's make a sample conversation to see how this will work. Input: Today's weather is nice.",
+        f"Output: \n1. Express happiness that the weather is sunny",
+        f"Input: Would you like to have lunch with me?",
+        f"Output: \n1. Feeling shy\n2. Asking what to have for lunch",
         "That's great. Let's now begin the scripts of a story.",
         f"Yes, and hope you can breath life into the information points by writing the final action and speech of the character. Now I will begin to help you write the scripts of the story by simulating the response of the imaginary character {charaSet['name']} and output the information points for the scripts in the form of a list.",
     ]
@@ -202,15 +137,15 @@ def get_tone_prompts(
     writer = "Xeno"
     intro = charaSet["introduction"]
     chara_settings = combine_settings(filtered_setting=filtered_setting)
-    history_copy = history.copy()
+    history_copy = deepcopy(history)
     history_copy.pop()
     named_history = [
         name_embedded_msg(charaSet=charaSet, userSet=userSet, msg=msg)
         for msg in history_copy
     ]
     filtered_history = filter_history(
-        sayings=named_history,
-        input=history[-1]["content"]["content"],
+        history=named_history,
+        input=history[-1]["content"],
         num=20,
     )
     if filtered_history == []:
@@ -240,7 +175,7 @@ Here is the conversation history:
 {done_history}
 
 Then, this is what {userSet['name']} express:\n
-"{history[-1]['content']['content']}"
+"{history[-1]['content']}"
 
 By considering {charaSet['name']}'s thinking patterns, traits and the dialogue's content, {writer} considered these information points that {charaSet['name']} may want to express in {charaSet['name']}'s response:
 {info_points}

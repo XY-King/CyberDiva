@@ -14,6 +14,7 @@ import asyncio
 import websockets
 import time
 from config import get_embedding
+from utils import filter_sayings, combine_sayings, with_embedding, filter_history
 
 
 class CharaChat(Chat):
@@ -47,26 +48,33 @@ class CharaChat(Chat):
 
     def user_input(self, input: string):
         start_time = time.time()
-        self.get_filtered_setting(input)
+        named_input = self.user["name"] + ": " + input
+        super().user_input(named_input)
+        self.real_history.append(with_embedding({"role": "user", "content": input}))
+        print("user_input: " + str(time.time() - start_time))
 
+    def get_response(self):
+        start_time = time.time()
+        filtered_history = filter_history(
+            self.history, input=self.history[-1]["content"], num=256
+        )
+        for msg in filtered_history:
+            msg.pop("embedding")
+
+        self.get_filtered_setting(self.history[-1]["content"])
         init_msg = get_begin_prompts(
             charaSet=self.chara,
             userSet=self.user,
             filtered_setting=self.filtered_setting,
         )
-        named_input = self.user["name"] + ": " + input
-
-        if self.history == []:
-            for msg in init_msg:
-                self.history.append(msg)
-        else:
-            for i, msg in enumerate(init_msg):
-                self.history[i] = msg
-        super().user_input(named_input)
-        self.real_history.append(
-            with_embedding({"role": "user", "content": input})
+        response = openai.ChatCompletion.create(
+            model=self.setting["model"],
+            messages=[self.setting["sys_msg"]] + init_msg + filtered_history,
+            max_tokens=self.setting["max_tokens"],
+            temperature=self.setting["temperature"],
         )
-        print("user_input: " + str(time.time() - start_time))
+        print("get_response: " + str(time.time() - start_time))
+        return response.choices[0]["message"]["content"]
 
     def add_response(self, response: string):
         start_time = time.time()
@@ -93,13 +101,13 @@ class CharaChat(Chat):
         )
 
         tone_prompt = get_tone_prompts(
-                setting=self.setting,
-                charaSet=self.chara,
-                userSet=self.user,
-                history=self.real_history,
-                info_points=response,
-                filtered_setting=self.filtered_setting,
-            )
+            setting=self.setting,
+            charaSet=self.chara,
+            userSet=self.user,
+            history=self.real_history,
+            info_points=response,
+            filtered_setting=self.filtered_setting,
+        )
         # output the prompt to a file
         with open("prompt.txt", "w", encoding="UTF-8") as f:
             f.write(tone_prompt)
@@ -107,7 +115,14 @@ class CharaChat(Chat):
         tone_text = tone_response["choices"][0]["text"]
         tone_text = clean_response(tone_text)
 
-        self.history.append({"role": "assistant", "content": response})
+        self.history.append(
+            with_embedding(
+                {
+                    "role": "assistant",
+                    "content": tone_text,
+                }
+            )
+        )
         self.real_history.append(
             with_embedding(
                 {
@@ -171,9 +186,6 @@ class CharaChat(Chat):
 
 
 # HELPER FUNCTIONS
-def with_embedding(msg: dict):
-    embedding = get_embedding(msg["content"])
-    return {"content": msg, "embedding": embedding}
 
 
 def clean_response(response: string):
@@ -223,7 +235,9 @@ def pair_response_list(response_list: list, chara_motions: list):
             sayings=chara_motions,
             input=motion,
             num=1,
-        )[0]["content"]
+        )[
+            0
+        ]["content"]
         return motion
 
     response_pairs = []
