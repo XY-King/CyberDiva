@@ -102,10 +102,12 @@ def get_info_point_prompts(charaSet: dict, userSet: dict):
         f"To help me write the scripts of the story, you should output the information points in the response of {charaSet['name']} in the form of a list.",
         "I don't really understand that, can we make a sample conversation for an example?",
         f"Absolutely.\n{userSet['name']}: Today's weather is nice.",
-        f"{charaSet['name']}: \n1. Agreeing with the weather",
+        f"{charaSet['name']}: \n1. Showing happiness about the sunny weather",
         f"{userSet['name']}: Would you like to have lunch with me?",
         f"{charaSet['name']}: \n1. Showing agreement\n2. Asking what to have for lunch",
-        "That's awesome! Let's now begin the scripts of a story.",
+        f"{userSet['name']}: Would you like to have dinner with me?",
+        f"{charaSet['name']}: \n1. Disagreeing the idea\n2. Explaining for having a rehearsal this evening",
+        "That's awesome! Let's now begin the scripts of a story. The information points should be specific and informative.",
         "Yes, the information points I'm about to consider can definitely help breath life into the scripts of the story. And you shall cope with the information points later to write a response full of emotions in the scripts."
     ]
 
@@ -170,7 +172,7 @@ Character setting of {userSet['name']}:
 {writer} is writing the scripts of a story about a daily conversation between {charaSet['name']} and {userSet['name']}, as follows.
 In the story, {writer} will put the character's physical actions between brackets []. Note that actions and words of the character should alternate in the script. The script texts between each two actions should be short and expressive. 
 
-Example: [Motion1] Text1. [Motion2] Text2.
+Example: [Motion1] Saying1 [Motion2] Saying2
 
 Here is the conversation history:
 {done_history}

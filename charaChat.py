@@ -40,10 +40,11 @@ class CharaChat(Chat):
             )
             self.filtered_setting[key] = combine_sayings(filtered_values)
 
-    def user_input(self, input: string):
+    def user_input(self, input: string, nohuman: bool = False):
         start_time = time.time()
-        named_input = self.user["name"] + ": " + input
-        super().user_input(named_input)
+        if not nohuman:
+            input = self.user["name"] + ": " + input
+        super().user_input(input)
         self.real_history.append(with_embedding({"role": "user", "content": input}))
         print("user_input: " + str(time.time() - start_time))
 

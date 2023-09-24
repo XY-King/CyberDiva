@@ -74,7 +74,7 @@ function get_message_timeout(message) {
 function showMessage(text) {
     $(".message-text").stop();
     $(".message-text").html(text).fadeTo(200, 1);
-    var fontSize = Math.max(24, 100 / Math.sqrt(text.length));
+    var fontSize = Math.min(24, 150 / Math.sqrt(text.length));
     $(".message-text").css("font-size", fontSize + "px");
     var timeout = get_message_timeout(text) * 1000;
     console.log("timeout", timeout);
