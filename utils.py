@@ -1,6 +1,7 @@
 from config import get_embedding
 from openai.embeddings_utils import cosine_similarity
 from copy import deepcopy
+import locale
 
 def with_embedding(msg: dict):
     msg_copy = deepcopy(msg)
@@ -78,3 +79,6 @@ def combine_sayings(sayings: list, with_quotation=True):
             else:
                 result += f"{saying['content']}\n    "
     return result
+
+def change_language():
+    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')

@@ -8,6 +8,7 @@ from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtGui import QCursor
 import threading
 from config import set_api_key
+from utils import change_language
 
 print("starting...")
 app = Flask(__name__)
@@ -94,6 +95,8 @@ class MainWindow(QMainWindow):
         MainWindow.m_drag_position = None
 
 if __name__ == "__main__":
+    change_language()
+
     t = threading.Thread(target=run_app)
     t.daemon = True
     t.start()
