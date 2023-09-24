@@ -51,15 +51,16 @@ def filter_history(history: list, input: str, num: int):
     result = []
     for msg in filtered_history:
         if msg["role"] == "user":
-            result.append(history[msg["index"]])
-            if msg["index"] < len(history) - 1:
-                if not history[msg["index"] + 1] in filtered_history:
-                    result.append(history[msg["index"] + 1])
+            result.append(history_copy[msg["index"]])
+            if msg["index"] < len(history_copy) - 1:
+                if not history_copy[msg["index"] + 1] in filtered_history:
+                    result.append(history_copy[msg["index"] + 1])
         else:
-            if not history[msg["index"] - 1] in filtered_history:
-                result.append(history[msg["index"] - 1])
-            result.append(history[msg["index"]])
-
+            if not history_copy[msg["index"] - 1] in filtered_history:
+                result.append(history_copy[msg["index"] - 1])
+            result.append(history_copy[msg["index"]])
+    for msg in result:
+        msg.pop("index")
     return result
 
 # combine a list of sayings with embeddings into one string

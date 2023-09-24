@@ -6,6 +6,5 @@
     },
     "max_tokens": 256,
     "temperature": 1.0,
-    "presence_penalty": 1.0,
-    "language": "English"
+    "presence_penalty": 1.0
 }

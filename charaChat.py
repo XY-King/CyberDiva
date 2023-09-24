@@ -3,9 +3,7 @@ from chat import Chat
 from prompts import (
     get_begin_prompts,
     get_tone_prompts,
-    filter_sayings,
     filter_info_points,
-    combine_sayings,
 )
 from read import get_chara_setting_keys
 import openai
@@ -13,7 +11,6 @@ import json
 import asyncio
 import websockets
 import time
-from config import get_embedding
 from utils import filter_sayings, combine_sayings, with_embedding, filter_history
 
 
@@ -119,7 +116,7 @@ class CharaChat(Chat):
             with_embedding(
                 {
                     "role": "assistant",
-                    "content": tone_text,
+                    "content": response,
                 }
             )
         )

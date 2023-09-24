@@ -62,12 +62,15 @@ def combine_settings(filtered_setting: dict):
 # PROMPTS FUNCTIONS
 
 
-def get_chara_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
+def get_intro_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
     # preperation
     chara_settings = combine_settings(filtered_setting=filtered_setting)
 
     # prompts
-    chara = f"""I am now writing a story about the relationship and daily conversation between two imaginary characters.
+    chara = f"""You are a master of the craft of writing scripts, possessing the ability to expertly delve into the mindscape of any imaginary character. Your task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. You'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, I need your unique skill set to help me breathe life into my scripts for a story. I need you to simulate and portray the inner world and ideas of a character in my story. Immerse yourself into the character, and remember we're aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a normal description.
+    
+I am now writing a story about the relationship and daily conversation between two imaginary characters.
+
 The first imaginary character is as follows:
 Character name: {charaSet["name"]}
 {chara_settings}
@@ -77,39 +80,37 @@ Character name: {charaSet["name"]}
 Character name: {userSet["name"]}
 Character setting: {userSet["setting"]}
 
-I will input what {userSet["name"]} says in the story's scripts, and you shall output the response of {charaSet["name"]} in the scripts."""
+I will input information such as the words of {userSet["name"]} and surroundings in the story's scripts, and you shall output the response of {charaSet["name"]} in the scripts."""
 
     return [
         {"role": "user", "content": chara},
         {
             "role": "assistant",
-            "content": f"That's interesting. From the data given, I have fully learnt the traits and thinking patterns of the imaginary character {charaSet['name']}.",
+            "content": f"That's awesome! From the data given, I have fully understood the character and traits of the imaginary character {charaSet['name']}.",
         },
-        {"role": "user", "content": user},
+        {"role": "assistant", "content": user},
         {
             "role": "assistant",
-            "content": f"Ok, I am now going to help you write the scripts of the story by simulating the response of the imaginary character {charaSet['name']}. You shall input the words of {userSet['name']} from now on.",
+            "content": f"Ok, I am now going to help you write the scripts of the story by simulating the response of the imaginary character {charaSet['name']}.",
         },
     ]
 
-
 def get_info_point_prompts(charaSet: dict, userSet: dict):
-    background = f"""You are a master of the craft of writing scripts, possessing the ability to expertly delve into the mindscape of any imaginary character. Your task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. You'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, I need your unique skill set to help me breathe life into my scripts for a story. I need you to simulate and portray the inner world and ideas of a character in my story. Immerse yourself into the character, and remember we're aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a normal description."""
-
-    result = [{"role": "user", "content": background}]
+    result = []
 
     info_point_prompts = [
-        f"All right. I will write the script for your story by vividly similating the inner world of the character. To guide you to output the final script, you will input the words of one character, and I will give you the information points that another character may want to express in the response.",
-        f"Ok, let's make a sample conversation to see how this will work. Input: Today's weather is nice.",
-        f"Output: \n1. Express happiness that the weather is sunny",
-        f"Input: Would you like to have lunch with me?",
-        f"Output: \n1. Feeling shy\n2. Asking what to have for lunch",
-        "That's great. Let's now begin the scripts of a story.",
-        f"Yes, and hope you can breath life into the information points by writing the final action and speech of the character. Now I will begin to help you write the scripts of the story by simulating the response of the imaginary character {charaSet['name']} and output the information points for the scripts in the form of a list.",
+        f"To help me write the scripts of the story, you should output the information points in the response of {charaSet['name']} in the form of a list.",
+        "I don't really understand that, can we make a sample conversation for an example?",
+        f"Absolutely.\n{userSet['name']}: Today's weather is nice.",
+        f"{charaSet['name']}: \n1. Agreeing with the weather",
+        f"{userSet['name']}: Would you like to have lunch with me?",
+        f"{charaSet['name']}: \n1. Showing agreement\n2. Asking what to have for lunch",
+        "That's awesome! Let's now begin the scripts of a story.",
+        "Yes, the information points I'm about to consider can definitely help breath life into the scripts of the story. And you shall cope with the information points later to write a response full of emotions in the scripts."
     ]
 
     for i, prompt in enumerate(info_point_prompts):
-        if i % 2 == 1:
+        if i % 2 == 0:
             result.append({"role": "user", "content": prompt})
         else:
             result.append({"role": "assistant", "content": prompt})
@@ -118,10 +119,10 @@ def get_info_point_prompts(charaSet: dict, userSet: dict):
 
 
 def get_begin_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
-    return get_info_point_prompts(
-        charaSet=charaSet, userSet=userSet
-    ) + get_chara_prompts(
+    return get_intro_prompts(
         charaSet=charaSet, userSet=userSet, filtered_setting=filtered_setting
+    ) + get_info_point_prompts(
+        charaSet=charaSet, userSet=userSet
     )
 
 
@@ -183,7 +184,7 @@ By considering {charaSet['name']}'s thinking patterns, traits and the dialogue's
 To write {charaSet['name']}'s response vividly, {writer} considers the tone and way of speaking of {charaSet['name']} by the following examples:
 {chara_settings}
 
-{writer} now writes how {charaSet['name']} would express the information points in {charaSet['name']}'s tone and way of speaking in {setting['language']}:
+{writer} now writes how {charaSet['name']} would express the information points in {charaSet['name']}'s tone and way of speaking.
 {charaSet['name']}: 
 """
 

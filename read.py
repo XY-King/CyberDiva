@@ -4,7 +4,7 @@ import os
 from config import get_embeddings, get_embedding
 
 def get_chara_setting_keys(name: str):
-    charaInit = json.load(open(f"characters/{name}.json", "rb"))
+    charaInit = json.load(open(f"characters/{name}/model.json", "rb"))
     keys = []
     for key in charaInit.keys():
         if type(charaInit[key]) is list:
@@ -14,12 +14,12 @@ def get_chara_setting_keys(name: str):
 def get_chara_config():
     # get character setting
     name = json.load(open("chara.json", "rb"))["name"]
-    is_embedded = json.load(open(f"characters/{name}.json", "rb"))["is_embedded"]
+    is_embedded = json.load(open(f"characters/{name}/model.json", "rb"))["is_embedded"]
 
     if not is_embedded:
         embed_chara(name)
 
-    charaSet = json.load(open(f"characters/{name}_embedded.json", "rb"))
+    charaSet = json.load(open(f"characters/{name}/model_embedded.json", "rb"))
 
     # get live2d setting
     live2d_name = json.load(open("chara.json", "rb"))["live2d"]
@@ -34,7 +34,7 @@ def get_chara_config():
 def embed_chara(name: str):
     print("embedding character data...")
 
-    charaInit = json.load(open(f"characters/{name}.json", "rb"))
+    charaInit = json.load(open(f"characters/{name}/model.json", "rb"))
 
     # get all the keys where the value is a list but not a string
     keys = get_chara_setting_keys(name)
@@ -52,14 +52,14 @@ def embed_chara(name: str):
 
     # change the "is_embedded" to True
     charaInit["is_embedded"] = True
-    with open(f"characters/{name}.json", "w", encoding="UTF-8") as f:
+    with open(f"characters/{name}/model.json", "w", encoding="UTF-8") as f:
         json.dump(charaInit, f, ensure_ascii=False, indent=4)
     # output the json file with embeddings
     for embedded_value in embedded_values:
         key = embedded_value["key"]
         values = embedded_value["values"]
         charaInit[key] = values
-    with open(f"characters/{name}_embedded.json", "w", encoding="UTF-8") as f:
+    with open(f"characters/{name}/model_embedded.json", "w", encoding="UTF-8") as f:
         json.dump(charaInit, f, ensure_ascii=False, indent=4)
     
     print("character data embedded")
