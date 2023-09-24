@@ -7,9 +7,6 @@ from prompts import (
 )
 from read import get_chara_setting_keys
 import openai
-import json
-import asyncio
-import websockets
 import time
 from utils import filter_sayings, combine_sayings, with_embedding, filter_history
 
@@ -142,45 +139,6 @@ class CharaChat(Chat):
                 print("You: " + msg["content"])
             else:
                 print(self.chara["name"] + ": " + msg["content"])
-
-    def trigger_live2d(self, response_pairs: list):
-        async def send_message(myMotion, myText):
-            motion_msg = {
-                "msg": 13200,
-                "msgId": 1,
-                "data": {"id": 0, "type": 0, "mtn": myMotion},
-            }
-            text_msg = {
-                "msg": 11000,
-                "msgId": 1,
-                "data": {
-                    "id": 0,
-                    "text": myText,
-                    "textFrameColor": 0x000000,
-                    "textColor": 0xFFFFFF,
-                    "duration": 10000,
-                },
-            }
-            async with websockets.connect("ws://127.0.0.1:10086/api") as ws:
-                if myMotion != "":
-                    await ws.send(json.dumps(motion_msg))
-                if myText != "":
-                    await ws.send(json.dumps(text_msg))
-
-        loop = asyncio.get_event_loop()
-        for response in response_pairs:
-            if response["motion"] != "":
-                motion = filter_sayings(
-                    sayings=self.chara["motions"],
-                    input=response["motion"],
-                    num=1,
-                )[0]["content"]
-            else:
-                motion = ""
-            loop.run_until_complete(send_message(motion, response["text"]))
-            sleep_time = 0.1 * len(response["text"])
-            loop.run_until_complete(asyncio.sleep(sleep_time))
-
 
 # HELPER FUNCTIONS
 

@@ -1,0 +1,5 @@
+Flask==2.0.2
+openai==0.28.0
+PyQt5==5.15.9
+PyQt5_sip==12.12.2
+sentence_transformers==2.2.2
