@@ -15,10 +15,10 @@ def get_embeddings(sentences: list[str]):
     return [embedding.tolist() for embedding in embeddings]
 
 def set_api_key():
-    if os.path.exists("my_key.json"):
-        key_id = "my_key.json"
+    if os.path.exists("json/my_key.json"):
+        key_id = "json/my_key.json"
     else:
-        key_id = "key.json"
+        key_id = "json/key.json"
 
     api_key_setting = json.load(open(key_id, "rb"))
 

@@ -17,7 +17,7 @@ set_api_key()
 def index():
     global chatSet, charaSet, userSet, core
 
-    chatSet = json.load(open("config.json", "rb"))
+    chatSet = json.load(open("json/config.json", "rb"))
     charaSet = get_chara_config()
     userSet = get_user_config(charaSet["name"])
     core = CharaChat(chatSet=chatSet, charaSet=charaSet, userSet=userSet)

@@ -13,7 +13,7 @@ def get_chara_setting_keys(name: str):
 
 def get_chara_config():
     # get character setting
-    name = json.load(open("chara.json", "rb"))["name"]
+    name = json.load(open("json/chara.json", "rb"))["name"]
     is_embedded = json.load(open(f"characters/{name}/model.json", "rb"))["is_embedded"]
 
     if not is_embedded:
@@ -22,7 +22,7 @@ def get_chara_config():
     charaSet = json.load(open(f"characters/{name}/model_embedded.json", "rb"))
 
     # get live2d setting
-    live2d_name = json.load(open("chara.json", "rb"))["live2d"]
+    live2d_name = json.load(open("json/chara.json", "rb"))["live2d"]
     embed_live2d_motions(live2d_name)
     with open(f"static/live2d/{live2d_name}/motions_embedded.json", "rb") as f:
         live2d_motions = json.load(f)
@@ -94,10 +94,10 @@ def embed_live2d_motions(live2d_name: str):
     print("live2d motions embedded")
 
 def get_user_config(chara_name: str):
-    if os.path.exists("my_user.json"):
-        id = "my_user.json"
+    if os.path.exists("json/my_user.json"):
+        id = "json/my_user.json"
     else:
-        id = "user.json"
+        id = "json/user.json"
     
     userInit = json.load(open(id, "rb"))
     setting = userInit["setting"]
