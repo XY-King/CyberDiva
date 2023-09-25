@@ -108,7 +108,9 @@ def get_info_point_prompts(charaSet: dict, userSet: dict):
         f"{userSet['name']}: Would you like to have dinner with me?",
         f"{charaSet['name']}: \n1. Disagreeing the idea\n2. Explaining for having a rehearsal this evening",
         "That's awesome! Let's now begin the scripts of a story. The information points should be specific and informative.",
-        "Yes, the information points I'm about to consider can definitely help breath life into the scripts of the story. And you shall cope with the information points later to write a response full of emotions in the scripts."
+        "Yes, the information points I'm about to consider can definitely help breath life into the scripts of the story. And you shall cope with the information points later to write a response full of emotions in the scripts.", 
+        f"Note that the information points can contain either ideas that {charaSet['name']} would express or the motion that {charaSet['name']} would do. But one information point should only contain a single kind of content.",
+        "Ok, I will definitely provide specific and diverse information points.",
     ]
 
     for i, prompt in enumerate(info_point_prompts):
@@ -129,7 +131,6 @@ def get_begin_prompts(charaSet: dict, userSet: dict, filtered_setting: dict):
 
 
 def get_tone_prompts(
-    setting: dict,
     charaSet: dict,
     userSet: dict,
     history: list,
@@ -155,6 +156,10 @@ def get_tone_prompts(
         done_history = "There is no history yet."
     else:
         done_history = combine_sayings(filtered_history, with_quotation=False)
+    if history[-1]["content"].startswith(userSet["name"]):
+        happening = f"Then, this is what {userSet['name']} express:\n{history[-1]['content']}"
+    else:
+        happening = f"Then, this is what happens:\n{history[-1]['content']}"
 
     # prompts
     result = f"""{writer} is a master of the craft of writing scripts, possessing the ability to expertly delve into the mindscape of any imaginary character. His task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. He'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, he will breathe life into the scripts of a story. He is needed to simulate and portray the inner world and ideas of a character in a story, immerse himself into the character, and remember that he is aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a normal conversation.
@@ -177,8 +182,7 @@ Example: [Motion1] Saying1 [Motion2] Saying2
 Here is the conversation history:
 {done_history}
 
-Then, this is what {userSet['name']} express:\n
-"{history[-1]['content']}"
+{happening}
 
 By considering {charaSet['name']}'s thinking patterns, traits and the dialogue's content, {writer} considered these information points that {charaSet['name']} may want to express in {charaSet['name']}'s response:
 {info_points}
@@ -186,7 +190,7 @@ By considering {charaSet['name']}'s thinking patterns, traits and the dialogue's
 To write {charaSet['name']}'s response vividly, {writer} considers the tone and way of speaking of {charaSet['name']} by the following examples:
 {chara_settings}
 
-{writer} now writes how {charaSet['name']} would express the information points in {charaSet['name']}'s tone and way of speaking.
+{writer} now writes how {charaSet['name']} would express the information points in {charaSet['name']}'s tone and way of speaking, and/or play the corresponding motions.
 {charaSet['name']}: 
 """
 
