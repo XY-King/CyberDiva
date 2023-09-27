@@ -9,6 +9,7 @@ from read import get_chara_setting_keys
 import openai
 import time
 from utils import filter_sayings, combine_sayings, with_embedding, filter_history
+from stabilize import read_stabilizer
 
 
 class CharaChat(Chat):
@@ -18,6 +19,8 @@ class CharaChat(Chat):
         self.user = userSet
         self.real_history = []
         self.filtered_setting = []
+        read_stabilizer(self)
+        
 
     def get_filtered_setting(self, input: string):
         TOTAL_LENGTH = 5000

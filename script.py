@@ -23,7 +23,6 @@ def index():
     charaSet = get_chara_config()
     userSet = get_user_config(charaSet["name"])
     core = CharaChat(chatSet=chatSet, charaSet=charaSet, userSet=userSet)
-    stabilize(core)
 
     return render_template("index.html")
 
