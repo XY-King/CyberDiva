@@ -19,10 +19,9 @@ class CharaChat(Chat):
         self.user = userSet
         self.real_history = []
         self.filtered_setting = []
-        read_stabilizer(self)
-        
+        # read_stabilizer(self)
 
-    def get_filtered_setting(self, input: string):
+    def get_filtered_setting(self, input: string): 
         TOTAL_LENGTH = 5000
         self.filtered_setting = {}
         # get the keys in the charaInit for character setting
@@ -47,7 +46,13 @@ class CharaChat(Chat):
         start_time = time.time()
         if not nohuman:
             input = self.user["name"] + ": " + input
-        super().user_input(input)
+
+        tone_response = ""
+        if self.history != []:
+            tone_response = self.real_history[-1]["content"]
+            tone_response = "Result: " + tone_response + "\n\n"
+
+        self.history.append(with_embedding({"role": "user", "content": tone_response + input}))
         self.real_history.append(with_embedding({"role": "user", "content": input}))
         print("user_input: " + str(time.time() - start_time))
 
@@ -58,6 +63,9 @@ class CharaChat(Chat):
         )
         for msg in filtered_history:
             msg.pop("embedding")
+
+        with open("history.txt", "w", encoding="UTF-8") as f:
+            f.write(str(filtered_history))
 
         self.get_filtered_setting(self.history[-1]["content"])
         init_msg = get_begin_prompts(
@@ -110,6 +118,7 @@ class CharaChat(Chat):
 
         tone_text = tone_response["choices"][0]["text"]
         tone_text = clean_response(tone_text)
+        tone_text = self.chara["name"] + ": " + tone_text
 
         self.history.append(
             with_embedding(
@@ -142,6 +151,7 @@ class CharaChat(Chat):
             else:
                 print(self.chara["name"] + ": " + msg["content"])
 
+
 # HELPER FUNCTIONS
 
 
@@ -170,8 +180,8 @@ def seperate_response(response: string, charaSet: dict):
                 response_list.append({"type": "text", "content": response})
             break
         else:
-            left = response.index("[")
-            right = response.index("]")
+            left = get_index("[", response)
+            right = get_index("]", response)
             content_in = response[left + 1 : right]
             content_before = response[:left]
             content_after = response[right + 1 :]
@@ -184,6 +194,13 @@ def seperate_response(response: string, charaSet: dict):
             response = content_after
 
     return response_list
+
+
+def get_index(substring: string, string: string):
+    for i in range(len(string) - len(substring) + 1):
+        if string[i : i + len(substring)] == substring:
+            return i
+    return len(string)
 
 
 def pair_response_list(response_list: list, chara_motions: list):

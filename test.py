@@ -1,4 +1,5 @@
-mystr = "Hello World!"
+from charaChat import get_index
 
-if mystr.startswith("Hello"):
-    print("Yes")
+test = "hello [world] [hello] world"
+print(get_index("[", test))
+print(get_index("]", test))

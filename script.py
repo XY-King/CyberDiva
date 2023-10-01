@@ -9,11 +9,11 @@ from PyQt5.QtGui import QCursor
 import threading
 from config import set_api_key
 from utils import change_language
-from stabilize import stabilize
 
 print("starting...")
 app = Flask(__name__)
 set_api_key()
+app_port = 8080
 
 @app.route("/")
 def index():
@@ -42,7 +42,7 @@ def chat():
     return {"action_list": action_list}
 
 def run_app():
-    app.run(host="localhost", port=5000, debug=False)
+    app.run(host="localhost", port=app_port, debug=False)
 
 class MainWindow(QMainWindow):
     m_drag_position = None
@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
 
         # The web view
         self.web = QWebEngineView()
-        self.web.load(QUrl("http://localhost:5000"))
+        self.web.load(QUrl(f"http://localhost:{app_port}"))
         self.web.page().setBackgroundColor(Qt.transparent)
         self.web.setFixedSize(320, 720)
 
