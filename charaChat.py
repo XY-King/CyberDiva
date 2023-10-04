@@ -19,7 +19,7 @@ class CharaChat(Chat):
         self.user = userSet
         self.real_history = []
         self.filtered_setting = []
-        # read_stabilizer(self)
+        read_stabilizer(self)
 
     def get_filtered_setting(self, input: string): 
         TOTAL_LENGTH = 5000
@@ -102,7 +102,6 @@ class CharaChat(Chat):
             ),
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
-            presence_penalty=self.setting["presence_penalty"],
         )
 
         tone_prompt = get_tone_prompts(
@@ -192,7 +191,8 @@ def seperate_response(response: string, charaSet: dict):
             content_in = content_in.replace(charaSet["name"], "")
             response_list.append({"type": "motion", "content": content_in})
             response = content_after
-
+    
+    response_list.pop(0)
     return response_list
 
 

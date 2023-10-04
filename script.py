@@ -13,7 +13,7 @@ from utils import change_language
 print("starting...")
 app = Flask(__name__)
 set_api_key()
-app_port = 8080
+app_port = 5000
 
 @app.route("/")
 def index():

@@ -3,4 +3,5 @@ __pycache__/
 my_user.json
 my_key.json
 prompt.txt
+history.txt
 TODO.md
