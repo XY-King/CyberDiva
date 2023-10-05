@@ -36,6 +36,7 @@ def chat():
     print(user_input)
     core.user_input(user_input)
     response = core.get_response()
+    print(response)
     action_list = core.add_response(response=response)
     for reaction in action_list:
         print(reaction)

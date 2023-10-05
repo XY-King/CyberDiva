@@ -96,12 +96,8 @@ def get_info_point_prompts(charaSet: dict, userSet: dict):
         f"{userSet['name']}: Would you like to have dinner with me?",
         f"{charaSet['name']}: \n1. Disagreeing the idea\n2. Explaining for having a rehearsal this evening",
         "Right, I see. So the information points are the ideas that the imaginary character would express in the response.",
-        "Great! Let's now begin the scripts of a story. The information points should be specific and informative.",
+        "Great! Let's now begin the scripts of a story. The information points should be specific and informative. Each of them should contain one single specific idea to express, and there should be no vague, broad or general information points.",
         "Yes, the information points I'm about to consider can definitely help breath life into the scripts of the story. And you shall cope with the information points later to write a response full of emotions in the scripts.",
-        f"Note that the information points can contain either ideas that {charaSet['name']} would express or the motion that {charaSet['name']} would do. But one information point should only contain a single kind of content. Also the information points should only contain the ideas, but not directly the words that {charaSet['name']} would say.",
-        "Ok, I will do my best to provide specific and diverse information points.",
-        f"Most importantly, the number of information points should be less when {charaSet['name']} wants to keep rather silent, and more when {charaSet['name']} wants to express actively.",
-        "That makes sense. I will try to consider the number of information points according to the situation.",
     ]
 
     for i, prompt in enumerate(info_point_prompts):
@@ -178,7 +174,7 @@ By considering {charaSet['name']}'s thinking patterns, traits and the dialogue's
 To write {charaSet['name']}'s response vividly, the tone and way of speaking of {charaSet['name']} will be considered by the following examples:
 {chara_settings}
 
-You should now write how {charaSet['name']} would express the information points in {charaSet['name']}'s tone and way of speaking, and/or play the corresponding motions.
+You should now write how {charaSet['name']} would express the information points in {charaSet['name']}'s tone and way of speaking, and/or play the corresponding motions. The script should be long if {charaSet['name']} wants to express actively, and short if {charaSet['name']} wants to keep rather silent.
 {charaSet['name']}: 
 """
 

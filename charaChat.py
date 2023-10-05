@@ -10,6 +10,7 @@ import openai
 import time
 from utils import filter_sayings, combine_sayings, with_embedding, filter_history
 from stabilize import read_stabilizer
+from datetime import datetime
 
 
 class CharaChat(Chat):
@@ -42,10 +43,14 @@ class CharaChat(Chat):
             )
             self.filtered_setting[key] = combine_sayings(filtered_values)
 
-    def user_input(self, input: string, nohuman: bool = False):
+    def user_input(self, input: string, nohuman: bool = False, timing: str = ""):
         start_time = time.time()
+        
         if not nohuman:
             input = self.user["name"] + ": " + input
+        if timing == "":
+            timing = datetime.now().strftime("%Y/%m/%d %H:%M")
+        input = timing + " " + input
 
         tone_response = ""
         if self.history != []:
@@ -89,21 +94,6 @@ class CharaChat(Chat):
             input=self.history[-1]["content"],
             charaSet=self.chara,
         )
-        print("filter_info_points: " + str(time.time() - start_time))
-        start_time = time.time()
-        tone_response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=get_tone_prompts(
-                charaSet=self.chara,
-                userSet=self.user,
-                history=self.real_history,
-                info_points=response,
-                filtered_setting=self.filtered_setting,
-            ),
-            max_tokens=self.setting["max_tokens"],
-            temperature=self.setting["temperature"],
-        )
-
         tone_prompt = get_tone_prompts(
             charaSet=self.chara,
             userSet=self.user,
@@ -115,7 +105,14 @@ class CharaChat(Chat):
         with open("prompt.txt", "w", encoding="UTF-8") as f:
             f.write(tone_prompt)
 
-        tone_text = tone_response["choices"][0]["text"]
+        tone_response = openai.ChatCompletion.create(
+            model=self.setting["model"],
+            messages=[{"role": "user", "content": tone_prompt}], 
+            max_tokens=self.setting["max_tokens"],
+            temperature=self.setting["temperature"],
+        )
+
+        tone_text = tone_response.choices[0]["message"]["content"]
         tone_text = clean_response(tone_text)
         tone_text = self.chara["name"] + ": " + tone_text
 
@@ -165,7 +162,7 @@ def clean_response(response: string):
         if not response[i] in ["\n", " ", '"']:
             response = response[: i + 1]
             break
-    # clear all the \" in the response
+    # clear all the " in the response
     response = response.replace('"', "")
     return response
 

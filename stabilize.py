@@ -1,15 +1,16 @@
 import json
 import os
 from utils import with_embedding
+import time
 
 SAYINGS = [
-    "Good morning",
-    "Today's weather is nice",
-    "Would you like to have lunch with me?",
-    "What's your plan next?",
-    "Would you like to have dinner with me?",
-    "Good night",
-    "(The next day comes)",
+    {"time": "2023/10/03 8:00", "content": "Good morning"},
+    {"time": "2023/10/03 8:01", "content": "Today's weather is nice"},
+    {"time": "2023/10/03 12:00", "content": "Would you like to have lunch with me?"},
+    {"time": "2023/10/03 13:00", "content": "What's your plan next?"},
+    {"time": "2023/10/03 18:00", "content": "Would you like to have dinner with me?"},
+    {"time": "2023/10/03 24:00", "content": "Good night"},
+    {"time": "2023/10/04 8:00", "content": "(The next day comes)"},
 ]
 
 TURNS = 10
@@ -26,15 +27,19 @@ def read_stabilizer(self):
 
 
 def stabilize(self):
-    for saying in SAYINGS:
-        if saying == SAYINGS[-1]:
-            self.user_input(saying, nohuman=True)
+    for saying_data in SAYINGS:
+        saying = saying_data["content"]
+        if saying_data == SAYINGS[-1]:
+            self.user_input(saying, nohuman=True, timing=saying_data["time"])
         else:
-            self.user_input(saying)
+            self.user_input(saying, timing=saying_data["time"])
         mid_results = []
         results = []
         while True:
             for i in range(TURNS):
+                if self.setting["model"] == "gpt-4":
+                    # sleep for 10 second to avoid the 429 error
+                    time.sleep(10)
                 mid = self.get_response()
                 mid_results.append(mid)
 
@@ -54,6 +59,9 @@ def stabilize(self):
             mid_results[mid_index] = f.read()
         while True:
             for i in range(TURNS):
+                if self.setting["model"] == "gpt-4":
+                    # sleep for 10 second to avoid the 429 error
+                    time.sleep(10)
                 self.add_response(mid_results[mid_index])
                 res = self.real_history[-1]
                 results.append(res)

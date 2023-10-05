@@ -1,5 +1,4 @@
-from charaChat import get_index
+from datetime import datetime
 
-test = "hello [world] [hello] world"
-print(get_index("[", test))
-print(get_index("]", test))
+date = datetime.now().strftime("%Y/%m/%d %H:%M ")
+print(date)
