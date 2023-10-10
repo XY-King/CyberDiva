@@ -1,9 +1,8 @@
 import string
 from chat import Chat
 from prompts import (
-    get_begin_prompts,
+    get_intro_prompts, 
     get_tone_prompts,
-    filter_info_points,
 )
 from read import get_chara_setting_keys
 import openai
@@ -52,12 +51,7 @@ class CharaChat(Chat):
             timing = datetime.now().strftime("%Y/%m/%d %H:%M")
         input = timing + " " + input
 
-        tone_response = ""
-        if self.history != []:
-            tone_response = self.real_history[-1]["content"]
-            tone_response = "Result: " + tone_response + "\n\n"
-
-        self.history.append(with_embedding({"role": "user", "content": tone_response + input}))
+        self.history.append(with_embedding({"role": "user", "content": input}))
         self.real_history.append(with_embedding({"role": "user", "content": input}))
         print("user_input: " + str(time.time() - start_time))
 
@@ -73,11 +67,16 @@ class CharaChat(Chat):
             f.write(str(filtered_history))
 
         self.get_filtered_setting(self.history[-1]["content"])
-        init_msg = get_begin_prompts(
+        init_msg = get_intro_prompts(
             charaSet=self.chara,
             userSet=self.user,
             filtered_setting=self.filtered_setting,
+            history=self.real_history,
         )
+        with open("init_msg.txt", "w", encoding="UTF-8") as f:
+            f.write(init_msg[0]["content"])
+                             
+
         response = openai.ChatCompletion.create(
             model=self.setting["model"],
             messages=[self.setting["sys_msg"]] + init_msg + filtered_history,
@@ -89,11 +88,6 @@ class CharaChat(Chat):
 
     def add_response(self, response: string):
         start_time = time.time()
-        response = filter_info_points(
-            info_points=response,
-            input=self.history[-1]["content"],
-            charaSet=self.chara,
-        )
         tone_prompt = get_tone_prompts(
             charaSet=self.chara,
             userSet=self.user,
