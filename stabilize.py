@@ -23,7 +23,6 @@ def read_stabilizer(self):
     with open(f"characters/{name}/stabilizer.json", "r") as f:
         stabilizer = json.load(f)
     self.history = stabilizer["history"]
-    self.real_history = stabilizer["real_history"]
 
 
 def stabilize(self):
@@ -63,10 +62,9 @@ def stabilize(self):
                     # sleep for 10 second to avoid the 429 error
                     time.sleep(10)
                 self.add_response(mid_results[mid_index])
-                res = self.real_history[-1]
+                res = self.history[-1]
                 results.append(res)
                 self.history.pop()
-                self.real_history.pop()
 
             for i, result in enumerate(results):
                 print(f"{i + 1}: {result['content']}")
@@ -79,15 +77,13 @@ def stabilize(self):
             with_embedding(
                 {
                     "role": "assistant",
-                    "content": mid_results[mid_index],
+                    "content": results[final_index],
                 }
             )
         )
-        self.real_history.append(results[final_index])
 
     name = self.chara["name"]
     stabilizer = {}
     stabilizer["history"] = self.history
-    stabilizer["real_history"] = self.real_history
     with open(f"characters/{name}/stabilizer.json", "w") as f:
         json.dump(stabilizer, f, indent=4)

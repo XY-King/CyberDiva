@@ -1,7 +1,7 @@
 import string
 from chat import Chat
 from prompts import (
-    get_intro_prompts, 
+    get_intro_prompts,
     get_tone_prompts,
 )
 from read import get_chara_setting_keys
@@ -17,11 +17,10 @@ class CharaChat(Chat):
         super().__init__(chatSet)
         self.chara = charaSet
         self.user = userSet
-        self.real_history = []
         self.filtered_setting = []
         read_stabilizer(self)
 
-    def get_filtered_setting(self, input: string): 
+    def get_filtered_setting(self, input: string):
         TOTAL_LENGTH = 5000
         self.filtered_setting = {}
         # get the keys in the charaInit for character setting
@@ -44,7 +43,7 @@ class CharaChat(Chat):
 
     def user_input(self, input: string, nohuman: bool = False, timing: str = ""):
         start_time = time.time()
-        
+
         if not nohuman:
             input = self.user["name"] + ": " + input
         if timing == "":
@@ -52,7 +51,6 @@ class CharaChat(Chat):
         input = timing + " " + input
 
         self.history.append(with_embedding({"role": "user", "content": input}))
-        self.real_history.append(with_embedding({"role": "user", "content": input}))
         print("user_input: " + str(time.time() - start_time))
 
     def get_response(self):
@@ -71,11 +69,10 @@ class CharaChat(Chat):
             charaSet=self.chara,
             userSet=self.user,
             filtered_setting=self.filtered_setting,
-            history=self.real_history,
+            history=self.history,
         )
         with open("init_msg.txt", "w", encoding="UTF-8") as f:
             f.write(init_msg[0]["content"])
-                             
 
         response = openai.ChatCompletion.create(
             model=self.setting["model"],
@@ -91,7 +88,7 @@ class CharaChat(Chat):
         tone_prompt = get_tone_prompts(
             charaSet=self.chara,
             userSet=self.user,
-            history=self.real_history,
+            history=self.history,
             info_points=response,
             filtered_setting=self.filtered_setting,
         )
@@ -101,7 +98,7 @@ class CharaChat(Chat):
 
         tone_response = openai.ChatCompletion.create(
             model=self.setting["model"],
-            messages=[{"role": "user", "content": tone_prompt}], 
+            messages=[{"role": "user", "content": tone_prompt}],
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
         )
@@ -111,14 +108,6 @@ class CharaChat(Chat):
         tone_text = self.chara["name"] + ": " + tone_text
 
         self.history.append(
-            with_embedding(
-                {
-                    "role": "assistant",
-                    "content": response,
-                }
-            )
-        )
-        self.real_history.append(
             with_embedding(
                 {
                     "role": "assistant",
@@ -134,7 +123,7 @@ class CharaChat(Chat):
 
     def print_history(self):
         # os.system("cls")
-        for _msg in self.real_history:
+        for _msg in self.history:
             msg = _msg["content"]
             if msg["role"] == "user":
                 print("You: " + msg["content"])
@@ -182,7 +171,7 @@ def seperate_response(response: string, charaSet: dict):
             content_in = content_in.replace(charaSet["name"], "")
             response_list.append({"type": "motion", "content": content_in})
             response = content_after
-    
+
     response_list.pop(0)
     return response_list
 
