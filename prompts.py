@@ -33,17 +33,25 @@ def combine_history(history: list, userSet: dict):
 
 
 def get_intro_prompts(
-    charaSet: dict, userSet: dict, filtered_setting: dict, history: list
+    charaSet: dict,
+    userSet: dict,
+    filtered_setting: dict,
+    history: list,
+    is_stable: bool = True,
 ):
     # preperation
     combined_history = combine_history(history=history, userSet=userSet)
-    chara_settings = combine_settings(filtered_setting=filtered_setting)
+    if is_stable:
+        chara_settings = ""
+    else:
+        chara_settings = combine_settings(filtered_setting=filtered_setting)
 
     # prompts
     prompt = f"""I am now writing a story about the relationship and daily conversation between two imaginary characters.
 
 The main character is as follows.
 Character name: {charaSet["name"]}
+Character settings: {charaSet["introduction"]}
 {chara_settings}
 
 The second imaginary character is as follows:
@@ -75,51 +83,43 @@ def get_tone_prompts(
     history: list,
     info_points: string,
     filtered_setting: dict,
+    is_stable: bool = True,
 ):
     # preperation
     intro = charaSet["introduction"]
-    chara_settings = combine_settings(filtered_setting=filtered_setting)
-    combined_history = combine_history(history=history, userSet=userSet)
-    if history[-1]["content"].startswith(userSet["name"]):
-        happening = (
-            f"Then, this is what {userSet['name']} express:\n{history[-1]['content']}"
-        )
+    if is_stable:
+        chara_settings = ""
     else:
-        happening = f"Then, this is what happens:\n{history[-1]['content']}"
+        chara_settings = combine_settings(filtered_setting=filtered_setting)
+    combined_history = combine_history(history=history, userSet=userSet)
 
     # prompts
-    result = f"""You are a master of the craft of writing scripts, possessing the ability to expertly delve into the mindscape of any imaginary character. Your task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. You'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, you will breathe life into the scripts of a story. You needs to simulate and portray the inner world and ideas of a character in a story, immerse yourself into the character, and remember that you are aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a normal conversation.
+    result = f"""Here is the writing process of a story about a daily conversation between {charaSet['name']} and {userSet['name']}, as follows.
+In the story, there are two imaginary characters.
     
-You are now writing the scripts of a story about a daily conversation between {charaSet['name']} and {userSet['name']}, as follows.
-In the story, there are two imaginary characters. 
-    
-The main character is {charaSet['name']}. 
+The main character is {charaSet['name']}.
 Character setting of {charaSet['name']}:
 {intro}
+{chara_settings}
 
 The second character is {userSet['name']}.
 Character setting of {userSet['name']}:
 {userSet['setting']}
 
-In the story, the character's physical actions should be put between brackets []. Note that actions and words of the character should alternate in the script. The script texts between each two actions should be short and expressive. 
-
-Example: [Motion1] Saying1 [Motion2] Saying2
-
 The current progress of writing the scripts of the story is as follows:
-
 Here is the conversation history:
 {combined_history}
 
 Then, this is what happens:
 {history[-1]['content']}
 
-By considering {charaSet['name']}'s thinking patterns, traits and the dialogue's content, these information points are proposed that {charaSet['name']} may want to express in {charaSet['name']}'s response:
+By considering {charaSet['name']}'s thinking patterns, traits and the dialogue's content, these information are considered possible in {charaSet['name']}'s response:
 {info_points}
 
-To write {charaSet['name']}'s response vividly, the tone and way of speaking of {charaSet['name']} will be considered by the following examples:
-{chara_settings}
+In the story, the character's physical actions should be put between brackets []. Note that actions and words of the character should alternate in the script. The script texts between each two actions should be short and expressive. 
+Example: [Motion] Words [Motion] Words
 
-You should now write how {charaSet['name']} would express the information points in {charaSet['name']}'s tone and way of speaking, and/or play the corresponding motions. The script should be long if {charaSet['name']} wants to express actively, and short if {charaSet['name']} wants to keep rather silent.
+Finally, here is how Rinko would express the information in Rinko's tone and way of speaking, and play the corresponding motions in the scripts:
 {charaSet['name']}: 
 """
 

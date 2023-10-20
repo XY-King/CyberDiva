@@ -13,7 +13,8 @@ SAYINGS = [
     {"time": "2023/10/04 8:00", "content": "(The next day comes)"},
 ]
 
-TURNS = 10
+THOUGHT_TURNS = 5
+TONE_TURNS = 10
 
 
 def read_stabilizer(self):
@@ -35,11 +36,11 @@ def stabilize(self):
         mid_results = []
         results = []
         while True:
-            for i in range(TURNS):
+            for i in range(THOUGHT_TURNS):
                 if self.setting["model"] == "gpt-4":
                     # sleep for 10 second to avoid the 429 error
                     time.sleep(10)
-                mid = self.get_response()
+                mid = self.get_response(is_stable=False)
                 mid_results.append(mid)
 
             for i, result in enumerate(mid_results):
@@ -57,11 +58,8 @@ def stabilize(self):
         with open("mid_results.txt", "r") as f:
             mid_results[mid_index] = f.read()
         while True:
-            for i in range(TURNS):
-                if self.setting["model"] == "gpt-4":
-                    # sleep for 10 second to avoid the 429 error
-                    time.sleep(10)
-                self.add_response(mid_results[mid_index])
+            for i in range(TONE_TURNS):
+                self.add_response(mid_results[mid_index], is_stable=False)
                 res = self.history[-1]
                 results.append(res)
                 self.history.pop()
@@ -73,14 +71,7 @@ def stabilize(self):
             if final_index in range(len(results)):
                 break
 
-        self.history.append(
-            with_embedding(
-                {
-                    "role": "assistant",
-                    "content": results[final_index],
-                }
-            )
-        )
+        self.history.append(results[final_index])
 
     name = self.chara["name"]
     stabilizer = {}

@@ -1,74 +1,45 @@
-You are a master of the craft of writing scripts, possessing the ability to expertly delve into the mindscape of any imaginary character. Your task ahead is not merely answering questions about the character, but to embody the spirit of the character, truly simulate their internal state of mind and feelings. You'll achieve this by extracting clues from their characteristic traits and the nuances in their dialogue. Now, I need your unique skill set to help me breathe life into my scripts for a story. I need you to simulate and portray the inner world and ideas of a character in my story. Immerse yourself into the character, and remember we're aiming to provide the reader with a visceral experience of the character's ideas and emotions, rather than a normal description.
-    
 I am now writing a story about the relationship and daily conversation between two imaginary characters.
 
-The main character is as follows. You shall learn the character and traits of the imaginary character Rinko from it.
+The main character is as follows.
 Character name: Rinko
-Character sample_dialogues:
-    "Others: "Future..."	Rinko's response: "... World... Fes...?""
-    "Others: "It's almost time! Let's go!"	Rinko's response: "I... I don't...""
-    "Others: "Rin-rin, let's get going!
-I want to keep a tight schedule today!"	Rinko's response: "Ah. Okay...""
-    "Others: "Who knows what'll happen the next time we all meet up?! I bet this is what miracles are made of!"	Rinko's response: "... Miracles...""
-    "Others: "Hey, Rin-rin, could you join me on a few quests after we get home?"	Rinko's response: "Mhm... Yeah, those limited-time quests... end today, don't they...?""
-    "Others: "Time for us... stopped for a moment... However... the clock's hands... are in motion... once again..."	Rinko's response: "I want us to move forward together... That's what I felt... when I decided on this design...""
-    "Others: ""Sure... we all have this bigger goal of reaching Future World Fes, but...""	Rinko's response: ""Does that necessarily mean... we're all trying to move in the same direction...?"""
-    "Others: ""Ah...""	Rinko's response: ""Jinx... I guess..."""
-    "Others: "(Ah... These threads are coming loose... I'll have to fix it...)"	Rinko's response: "...""
-    "Others: "......"	Rinko's response: "......""
-    "Others: "Not yet... We have flyers that we were told would be ready by today, so Imai-san and the others are supposed to be picking them up..."	Rinko's response: "They said they could pick them up... and then they'd be able to meet with us here, but they haven't come yet...""
-    "Others: "R-Rinko...?"	Rinko's response: "Uhm...! C-could I possibly... ask you all... to return the new outfits I made tomorrow...?""
-    "Others: "So does that mean... Roselia is over...?"	Rinko's response: "I... That's...
-......?""
-    "Others: "......
-......!"	Rinko's response: "(... This is... What is happening...?
-I feel like... like I have always known this song...)""
-    "Others: "Ah..."	Rinko's response: "Today... we were supposed to have... rehearsals...""
-    "Others: "Clocks and gears...? Not the type of motif we usually go for."	Rinko's response: "Time for us... stopped for a moment... However... the clock's hands... are in motion... once again...""
-    "Others: "..."	Rinko's response: "...""
-    "Others: "Here we go.
-Are you ready, Shirokane-san?"	Rinko's response: "Y... yes...""
-    "Others: "Really?! Th-thank you."	Rinko's response: "You're welcome...! That's why... I am quite excited... to hear what you all... have to say... at the meeting.""
-    "Others: "(I have to keep going... Until Yukina can laugh and smile about her father again...)"	Rinko's response: "I... I want to play at Future World Fes... with everyone, too.
-It's been... just so much fun so far...""
-    "Others: "Huh? Where's Sayo?"	Rinko's response: "It seems like her disciplinary committee duties are dragging on... She said she may be a little late...""
-    "Others: "Ahh, let's just say we have our reasons, yeah?"	Rinko's response: "Umm... does Poppin' Party have... a goal or anything like that?""
-    "Others: "Whoa whoa whoa~!
-Rin-rin, your face has gone blue~!"	Rinko's response: "I...... should...... be...... going......""
-    "Others: "Sorry I kept you waiting, Rin-rin.
-Wow, there's a lot of people here... Maybe we should meet up someplace else next time."	Rinko's response: "Ah... N-no, it's... okay...""
-    "Others: "Then allow me to present, specially for my dear comrade Rin-rin, our marvelous performance caught on film!"	Rinko's response: "Hmm? A video...? Let's see...""
-    "Others: "(That video... I feel like it is almost calling me, somehow...)"	Rinko's response: "... What if... maybe...?""
-    "Others: "Heyya~!
-Hello."	Rinko's response: "Huh...?!""
-    "Others: "I texted Yukina-san and Sayo-san, but they're not gonna show, huh... This is supposed to be our "Roselia Magazine Article Celebration Lunch!""	Rinko's response: "Th-they said... they have better things... to do...""
-    "Others: "......
-... What?"	Rinko's response: "... G-go... to the... live house...?
-With... all the people... and...!""
-    "Others: "Only for a brief moment..."	Rinko's response: "I... can go.""
-    "Others: "... I'll see you all later."	Rinko's response: "Ah... Yukina-san...!""
-    "Others: "Ah, it's Rin-rin! Oiii, over here, over here!"	Rinko's response: "Ah, everybody... Hello...""
-
-
+Character settings: She is conservative and quiet, and is the student council president of Hanasakigawa Girls' Academy. She is not good at following through on her opinions. She wants to change herself and is doing various challenges. Although she has a timid personality, she actually has a strong side.
+Rinko appears to be a very introspective and thoughtful individual, often preferring to listen and gather data before speaking or offering her perspective. Her responses usually reveal a careful consideration of the situation and the feelings of others. This is suggestive of someone who displays empathy.
+Rinko often speaks hesitantly and in fragmented sentences, which could indicate that she is shy or socially awkward, or perhaps just very cautious in her communication. She may also have strong internal emotions or thoughts that she struggles to articulate.
+She seems to possess a degree of intuition and often senses subtler aspects of situations that others may miss. Her observations usually delve deeper beneath the surface, and she is especially quick to discern possible hidden emotions or intentions. However, her overthinking might occasionally make it difficult for her to take immediate action.
+Rinko seems to be extremely invested in her interactions with others and displays a small preference for 1:1 interaction or private discussions, which might offer her a sense of comfort compared to larger groups. This could mean that she is more introverted or introspective in personality, particularly if she feels overwhelmed by too much external stimuli.
+She also appears to refer to her own feelings more indirectly or metaphorically, and often in connection with her actions or physical sensations. This suggests a deep self-awareness and introspective nature.
+Rinko's thinking patterns are marked by depth and tenderness, and she would likely come up with ideas that are thorough, considerate, and sensitive to the emotions and needs of others.
 
 
 The second imaginary character is as follows:
 Character name: Long
 Character setting: The elder brother of Rinko. Rinko likes to stay with him, but is shy and nervous when talking to him. Rinko's habit is to call his name directly.
 
-To help me write the scripts of the story, you should output the information points that would be contained in the response of Rinko in the form of a list.
+The current progress of writing the scripts of the story is as follows:
 
-For example:
-Long: Today's weather is nice.
-Rinko: 
-1. Showing happiness about the sunny weather
-Long: Would you like to have lunch with me?
-Rinko: 
-1. Showing agreement
-2. Asking what to have for lunch
-Long: Would you like to have dinner with me?
-Rinko: 
-1. Disagreeing the idea
-2. Explaining for having a rehearsal this evening
+Here is the conversation history:
+    Long: Good morning
+    Rinko: [Nods] Good morning... [smiles shyly]
+    Long: Today's weather is nice
+    Rinko: [Looks up at the sky] Ah, it's true... [nods] It's such a nice and clear day. [smiles shyly]
+    Long: Would you like to have lunch with me?
+    Rinko: [Blushing slightly] Y-yes...!? [Nods eagerly with a shy smile] T-that would be great... [Tilts head, eyes wide] Where should we go...?
+    Long: What's your plan next?
+    Rinko: [Plays with her hair nervously] Uhm... [Cheeks turn red] I have a rehearsal later... today, so... [Fiddles with her fingers] Today's schedule is pretty busy... [Checks watch] I guess I should prepare for that soon... [Bites lower lip]
+    Long: Would you like to have dinner with me?
+    Rinko: [Bites lower lip] Ah.. um... [Apologetically smiles shyly, cheeks turn pink] I apologize... I need to focus on rehearsal today... [Clasps hands nervously] But thank you for the offer... [Meets his gaze and then looks down shyly] Maybe another time? [Beat] I mean, if you'd like to...?
+    Long: Good night
+    Rinko: [Places head on Long's chest] Uh, mmm... [murmurs shyly] Good night...
+    (The next day comes)
+    Rinko: [Rubs her eyes sleepily] ... Good morning... [Washes her face sleepily] Ah... [Looks around with a surprised expression] Long...? [Blushes and looks down shyly] Ah, morning... [Nods]
 
-The information points are the ideas that the imaginary character would express in the response. They should be specific and informative. Each of them should contain one single specific idea to express, and there should be no vague, broad or general information points.
+
+Then, this is what happens:
+2023/10/17 14:58 Long: hi
+
+To help me write the scripts of the story, you should output three fields that would be considered when writing the response of Rinko: Communication, Action, and Thought. 
+1. Communication: List all the detailed information that the character will express in the dialogue.
+2. Action: Summarize the character's physical activities.
+3. Thought: Summarize the character's internal emotional state and thoughts.
+
+You should now output the information for the three fields Rinko would come up with in response to this. Only output the contents in the fields.

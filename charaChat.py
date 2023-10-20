@@ -53,7 +53,7 @@ class CharaChat(Chat):
         self.history.append(with_embedding({"role": "user", "content": input}))
         print("user_input: " + str(time.time() - start_time))
 
-    def get_response(self):
+    def get_response(self, is_stable: bool = True):
         start_time = time.time()
         filtered_history = filter_history(
             self.history, input=self.history[-1]["content"], num=256
@@ -65,25 +65,26 @@ class CharaChat(Chat):
             f.write(str(filtered_history))
 
         self.get_filtered_setting(self.history[-1]["content"])
-        init_msg = get_intro_prompts(
+        prompt = get_intro_prompts(
             charaSet=self.chara,
             userSet=self.user,
             filtered_setting=self.filtered_setting,
             history=self.history,
+            is_stable=is_stable,
         )
         with open("init_msg.txt", "w", encoding="UTF-8") as f:
-            f.write(init_msg[0]["content"])
+            f.write(prompt["content"])
 
         response = openai.ChatCompletion.create(
             model=self.setting["model"],
-            messages=[self.setting["sys_msg"]] + init_msg + filtered_history,
+            messages=[self.setting["sys_msg"], prompt],
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
         )
         print("get_response: " + str(time.time() - start_time))
         return response.choices[0]["message"]["content"]
 
-    def add_response(self, response: string):
+    def add_response(self, response: string, is_stable: bool = True):
         start_time = time.time()
         tone_prompt = get_tone_prompts(
             charaSet=self.chara,
@@ -91,19 +92,20 @@ class CharaChat(Chat):
             history=self.history,
             info_points=response,
             filtered_setting=self.filtered_setting,
+            is_stable=is_stable,
         )
         # output the prompt to a file
         with open("prompt.txt", "w", encoding="UTF-8") as f:
             f.write(tone_prompt)
 
-        tone_response = openai.ChatCompletion.create(
-            model=self.setting["model"],
-            messages=[{"role": "user", "content": tone_prompt}],
+        tone_response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=tone_prompt,
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
         )
 
-        tone_text = tone_response.choices[0]["message"]["content"]
+        tone_text = tone_response.choices[0]["text"]
         tone_text = clean_response(tone_text)
         tone_text = self.chara["name"] + ": " + tone_text
 
