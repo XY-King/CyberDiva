@@ -47,34 +47,38 @@ def get_intro_prompts(
         chara_settings = combine_settings(filtered_setting=filtered_setting)
 
     # prompts
-    prompt = f"""I am now writing a story about the relationship and daily conversation between two imaginary characters.
+    prompt = f"""Here is the writing process of a story about a daily conversation between {charaSet['name']} and {userSet['name']}.
+In the story, there are two imaginary characters.
 
-The main character is as follows.
-Character name: {charaSet["name"]}
-Character settings: {charaSet["introduction"]}
+The main character is {charaSet["name"]}.
+Character setting: 
+{charaSet["introduction"]}
 {chara_settings}
 
-The second imaginary character is as follows:
-Character name: {userSet["name"]}
-Character setting: {userSet["setting"]}
+The second imaginary character is {userSet["name"]}.
+Character setting: 
+{userSet["setting"]}
 
 The current progress of writing the scripts of the story is as follows:
 
 Here is the conversation history:
 {combined_history}
 
-Then, this is what happens:
-{history[-1]['content']}
+There are two steps to continue writing the scripts.
+The first step is to consider three fields in the response of Rinko: ACTION, THOUGHT, and COMMUNICATION. 
+THOUGHT: A summary of the {charaSet["name"]}'s internal emotional state and thoughts.
+ACTION: A summary of the {charaSet["name"]}'s physical activities. Focus on the body movements and facial expressions.
+COMMUNICATION: An outline of points that {charaSet["name"]} will convey in the dialogue. Only information points but not the exact words.
 
-To help me write the scripts of the story, you should output three fields that would be considered when writing the response of {charaSet["name"]}: Communication, Action, and Thought. 
-1. Communication: List all the detailed information that the character will express in the dialogue.
-2. Action: Summarize the character's physical activities.
-3. Thought: Summarize the character's internal emotional state and thoughts.
+Examples:
+THOUGHT: {charaSet["name"]} would feel (...).
+ACTION: {charaSet["name"]} would raise (...).
+COMMUNICATION: {charaSet["name"]} would mention (...). {charaSet["name"]} would also inquire (...).
 
-You should now output the information for the three fields {charaSet["name"]} would come up with in response to this. Only output the contents in the fields.
-"""
+By considering the Rinko's personality and the current scene, here is the fields contents in Rinko's performance in response to this:
+{history[-1]['content']}"""
 
-    return {"role": "user", "content": prompt}
+    return prompt
 
 
 def get_tone_prompts(
@@ -94,16 +98,16 @@ def get_tone_prompts(
     combined_history = combine_history(history=history, userSet=userSet)
 
     # prompts
-    result = f"""Here is the writing process of a story about a daily conversation between {charaSet['name']} and {userSet['name']}, as follows.
+    result = f"""Here is the writing process of a story about a daily conversation between {charaSet['name']} and {userSet['name']}.
 In the story, there are two imaginary characters.
     
 The main character is {charaSet['name']}.
-Character setting of {charaSet['name']}:
+Character setting:
 {intro}
 {chara_settings}
 
 The second character is {userSet['name']}.
-Character setting of {userSet['name']}:
+Character setting:
 {userSet['setting']}
 
 The current progress of writing the scripts of the story is as follows:
@@ -119,8 +123,7 @@ By considering {charaSet['name']}'s thinking patterns, traits and the dialogue's
 In the story, the character's physical actions should be put between brackets []. Note that actions and words of the character should alternate in the script. The script texts between each two actions should be short and expressive. 
 Example: [Motion] Words [Motion] Words
 
-Finally, here is how Rinko would express the information in Rinko's tone and way of speaking, and play the corresponding motions in the scripts:
-{charaSet['name']}: 
-"""
+Finally, here is how Rinko would express the information in {charaSet["name"]}'s tone and way of speaking, and play the corresponding motions in the scripts:
+{charaSet['name']}:"""
 
     return result

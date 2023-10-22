@@ -18,7 +18,7 @@ class CharaChat(Chat):
         self.chara = charaSet
         self.user = userSet
         self.filtered_setting = []
-        read_stabilizer(self)
+        # read_stabilizer(self)
 
     def get_filtered_setting(self, input: string):
         TOTAL_LENGTH = 5000
@@ -73,16 +73,16 @@ class CharaChat(Chat):
             is_stable=is_stable,
         )
         with open("init_msg.txt", "w", encoding="UTF-8") as f:
-            f.write(prompt["content"])
-
-        response = openai.ChatCompletion.create(
+            f.write(prompt)
+            
+        response = openai.Completion.create(
             model=self.setting["model"],
-            messages=[self.setting["sys_msg"], prompt],
+            prompt=prompt,
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
         )
         print("get_response: " + str(time.time() - start_time))
-        return response.choices[0]["message"]["content"]
+        return response.choices[0].text
 
     def add_response(self, response: string, is_stable: bool = True):
         start_time = time.time()
@@ -99,13 +99,13 @@ class CharaChat(Chat):
             f.write(tone_prompt)
 
         tone_response = openai.Completion.create(
-            model="text-davinci-003",
+            model=self.setting["model"],
             prompt=tone_prompt,
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
         )
 
-        tone_text = tone_response.choices[0]["text"]
+        tone_text = tone_response.choices[0].text
         tone_text = clean_response(tone_text)
         tone_text = self.chara["name"] + ": " + tone_text
 
