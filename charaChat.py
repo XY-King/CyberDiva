@@ -18,7 +18,7 @@ class CharaChat(Chat):
         self.chara = charaSet
         self.user = userSet
         self.filtered_setting = []
-        # read_stabilizer(self)
+        read_stabilizer(self)
 
     def get_filtered_setting(self, input: string):
         TOTAL_LENGTH = 5000
