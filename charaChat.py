@@ -1,8 +1,8 @@
 import string
 from chat import Chat
 from prompts import (
-    get_intro_prompts,
-    get_tone_prompts,
+    get_fields_prompt,
+    get_script_prompt,
 )
 from read import get_chara_setting_keys
 import openai
@@ -65,7 +65,7 @@ class CharaChat(Chat):
             f.write(str(filtered_history))
 
         self.get_filtered_setting(self.history[-1]["content"])
-        prompt = get_intro_prompts(
+        prompt = get_fields_prompt(
             charaSet=self.chara,
             userSet=self.user,
             filtered_setting=self.filtered_setting,
@@ -74,23 +74,24 @@ class CharaChat(Chat):
         )
         with open("init_msg.txt", "w", encoding="UTF-8") as f:
             f.write(prompt)
-            
+
         response = openai.Completion.create(
             model=self.setting["model"],
             prompt=prompt,
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
+            best_of=self.setting["best_of"],
         )
         print("get_response: " + str(time.time() - start_time))
-        return response.choices[0].text
+        return response.choices[0].text.strip()
 
     def add_response(self, response: string, is_stable: bool = True):
         start_time = time.time()
-        tone_prompt = get_tone_prompts(
+        tone_prompt = get_script_prompt(
             charaSet=self.chara,
             userSet=self.user,
             history=self.history,
-            info_points=response,
+            fields=response,
             filtered_setting=self.filtered_setting,
             is_stable=is_stable,
         )
@@ -103,10 +104,10 @@ class CharaChat(Chat):
             prompt=tone_prompt,
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
+            best_of=self.setting["best_of"],
         )
 
-        tone_text = tone_response.choices[0].text
-        tone_text = clean_response(tone_text)
+        tone_text = tone_response.choices[0].text.strip()
         tone_text = self.chara["name"] + ": " + tone_text
 
         self.history.append(
@@ -134,24 +135,6 @@ class CharaChat(Chat):
 
 
 # HELPER FUNCTIONS
-
-
-def clean_response(response: string):
-    # delete the nonsense at the beginning of the response
-    for i in range(len(response)):
-        if not response[i] in ["\n", " ", '"']:
-            response = response[i:]
-            break
-    # delete the nonsense at the end of the response
-    for i in range(len(response) - 1, -1, -1):
-        if not response[i] in ["\n", " ", '"']:
-            response = response[: i + 1]
-            break
-    # clear all the " in the response
-    response = response.replace('"', "")
-    return response
-
-
 def seperate_response(response: string, charaSet: dict):
     response_list = []
     # seperate the response into a list of strings by contents in brackets

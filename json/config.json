@@ -1,5 +1,6 @@
 {
     "model": "gpt-3.5-turbo-instruct",
-    "max_tokens": 256,
-    "temperature": 1.0
+    "max_tokens": 128,
+    "temperature": 1.0,
+    "best_of": 1
 }

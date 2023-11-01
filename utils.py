@@ -3,11 +3,13 @@ from openai.embeddings_utils import cosine_similarity
 from copy import deepcopy
 import locale
 
+
 def with_embedding(msg: dict):
     msg_copy = deepcopy(msg)
     embedding = get_embedding(msg["content"])
     msg_copy["embedding"] = embedding
     return msg_copy
+
 
 # filter the sayings by the relation with the input and return the top {num} sayings
 def filter_sayings(sayings: list, input: str, num: int, is_stable: bool = False):
@@ -16,7 +18,7 @@ def filter_sayings(sayings: list, input: str, num: int, is_stable: bool = False)
     for saying in sayings_copy:
         relation = cosine_similarity(input_embedding, saying["embedding"])
         saying["relation"] = relation
-        
+
     if not is_stable:
         # sort the sayings by the relation from the highest to the lowest
         sayings_copy.sort(key=lambda x: x["relation"], reverse=True)
@@ -31,11 +33,12 @@ def filter_sayings(sayings: list, input: str, num: int, is_stable: bool = False)
             if not saying in sayings_sorted:
                 sayings_copy[i] = None
         sayings_copy = list(filter(lambda x: x != None, sayings_copy))
-    
+
     for saying in sayings_copy:
         saying.pop("relation")
 
     return sayings_copy
+
 
 # filter the history, the filter result musty have pairs of user and assistant
 def filter_history(history: list, input: str, num: int):
@@ -64,21 +67,23 @@ def filter_history(history: list, input: str, num: int):
         msg.pop("index")
     return result
 
+
 # combine a list of sayings with embeddings into one string
 def combine_sayings(sayings: list, with_quotation=True):
-    result = "    "
+    result = ""
     for i, saying in enumerate(sayings):
         if with_quotation:
             if i == len(sayings) - 1:
-                result += f"\"{saying['content']}\"\n"
+                result += f"\"{saying['content']}\""
             else:
-                result += f"\"{saying['content']}\"\n    "
+                result += f"\"{saying['content']}\"\n"
         else:
             if i == len(sayings) - 1:
-                result += f"{saying['content']}\n"
+                result += f"{saying['content']}"
             else:
-                result += f"{saying['content']}\n    "
+                result += f"{saying['content']}\n"
     return result
 
+
 def change_language():
-    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+    locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
