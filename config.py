@@ -8,11 +8,11 @@ print("sentence transformer loading...")
 model_embed = SentenceTransformer("all-MiniLM-L6-v2")
 
 def get_embedding(sentence: str):
-    return model_embed.encode(sentence).tolist()
+    return model_embed.encode(sentence)
 
 def get_embeddings(sentences: list[str]):
     embeddings = model_embed.encode(sentences)
-    return [embedding.tolist() for embedding in embeddings]
+    return embeddings
 
 def set_api_key():
     if os.path.exists("json/my_key.json"):

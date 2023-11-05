@@ -4,11 +4,10 @@ import os
 from config import get_embeddings, get_embedding
 
 
-def get_chara_setting_keys(name: str):
-    charaInit = json.load(open(f"characters/{name}/model.json", "rb"))
+def get_chara_setting_keys(charaSet: dict):
     keys = []
-    for key in charaInit.keys():
-        if type(charaInit[key]) is list:
+    for key in charaSet.keys():
+        if type(charaSet[key]) is list:
             keys.append(key)
     return keys
 
@@ -16,88 +15,54 @@ def get_chara_setting_keys(name: str):
 def get_chara_config():
     # get character setting
     name = json.load(open("json/chara.json", "rb"))["name"]
-    is_embedded = json.load(open(f"characters/{name}/model.json", "rb"))["is_embedded"]
 
-    if not is_embedded:
-        embed_chara(name)
-
-    charaSet = json.load(open(f"characters/{name}/model_embedded.json", "rb"))
-
+    charaSet = json.load(open(f"characters/{name}/model.json", "rb"))
+    charaSet = embed_chara(charaSet)
     # get live2d setting
-    embed_live2d_motions(name)
+    live2d = json.load(open(f"characters/{name}/live2d/model.json", "rb"))
+    live2d_motions = live2d["motions"].keys()
+    charaSet["motions"] = embed_live2d_motions(live2d_motions)
     # copy the live2d directory under the character to the static directory
     os.system("rm -rf static/live2d")
     os.system(f"cp -r characters/{name}/live2d static/live2d")
-    with open(f"static/live2d/motions_embedded.json", "rb") as f:
-        live2d_motions = json.load(f)
-    charaSet["motions"] = live2d_motions
+    # get examples setting
+    with open(f"characters/{name}/examples.json", "rb") as f:
+        examples = json.load(f)
+    charaSet["examples"] = examples
     return charaSet
 
 
 # make the sayings of the character into embeddings
-def embed_chara(name: str):
+def embed_chara(charaSet: dict):
     print("embedding character data...")
-
-    charaInit = json.load(open(f"characters/{name}/model.json", "rb"))
-
     # get all the keys where the value is a list but not a string
-    keys = get_chara_setting_keys(name)
+    keys = get_chara_setting_keys(charaSet["name"])
 
-    embedded_values = []
     # get the embeddings for the values of the keys
     for key in keys:
-        values = charaInit[key]
+        values = charaSet[key]
         embeddings = get_embeddings(values)
-        done_values = {"key": key, "values": []}
-        # make the json of the values with the embeddings
+        embedded_values = []
+        # make the dict of the values with the embeddings
         for i in range(len(values)):
-            done_values["values"].append(
-                {"content": values[i], "embedding": embeddings[i]}
-            )
-        embedded_values.append(done_values)
-
-    # change the "is_embedded" to True
-    charaInit["is_embedded"] = True
-    with open(f"characters/{name}/model.json", "w", encoding="UTF-8") as f:
-        json.dump(charaInit, f, ensure_ascii=False, indent=4)
-    # output the json file with embeddings
-    for embedded_value in embedded_values:
-        key = embedded_value["key"]
-        values = embedded_value["values"]
-        charaInit[key] = values
-    with open(f"characters/{name}/model_embedded.json", "w", encoding="UTF-8") as f:
-        json.dump(charaInit, f, ensure_ascii=False, indent=4)
-
+            embedded_values.append({"content": values[i], "embedding": embeddings[i]})
+        charaSet[key] = embedded_values
     print("character data embedded")
+    return charaSet
 
 
-def embed_live2d_motions(name: str):
+def embed_live2d_motions(motions: list[str]):
     print("embedding live2d motions...")
-
-    # if the motions_embedded.json file exists, then return
-    if os.path.exists(f"characters/{name}/live2d/motions_embedded.json"):
-        return
-
-    # get the motions
-    live2d_model = json.load(open(f"characters/{name}/live2d/model.json", "rb"))
-    live2d_motions = live2d_model["motions"]
-    # get all the keys of the motions and transform it into a list
-    live2d_motions = list(live2d_motions.keys())
-
     # embed the motions
-    motion_embeddings = get_embeddings(live2d_motions)
+    motion_embeddings = get_embeddings(motions)
     # make the json file of the motions with the embeddings
     motions_embedded = []
-    for i in range(len(live2d_motions)):
-        embedding = motion_embeddings[i]
-        motions_embedded.append({"content": live2d_motions[i], "embedding": embedding})
-    # output the json file with embeddings
-    with open(
-        f"characters/{name}/live2d/motions_embedded.json", "w", encoding="UTF-8"
-    ) as f:
-        json.dump(motions_embedded, f, ensure_ascii=False, indent=4)
-
+    for i in range(len(motions)):
+        motions_embedded.append(
+            {"content": motions[i], "embedding": motion_embeddings[i]}
+        )
     print("live2d motions embedded")
+    return motions_embedded
 
 
 def get_user_config(chara_name: str):

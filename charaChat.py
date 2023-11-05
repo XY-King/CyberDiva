@@ -18,10 +18,10 @@ class CharaChat(Chat):
         self.chara = charaSet
         self.user = userSet
         self.filtered_setting = []
-        read_stabilizer(self)
+        # read_stabilizer(self)
 
     def get_filtered_setting(self, input: string):
-        TOTAL_LENGTH = 5000
+        TOTAL_LENGTH = 2000
         self.filtered_setting = {}
         # get the keys in the charaInit for character setting
         keys = get_chara_setting_keys(self.chara["name"])
@@ -44,11 +44,11 @@ class CharaChat(Chat):
     def user_input(self, input: string, nohuman: bool = False, timing: str = ""):
         start_time = time.time()
 
-        if not nohuman:
-            input = self.user["name"] + ": " + input
         if timing == "":
             timing = datetime.now().strftime("%Y/%m/%d %H:%M")
         input = timing + " " + input
+        if not nohuman:
+            input = self.user["name"] + ": " + input
 
         self.history.append(with_embedding({"role": "user", "content": input}))
         print("user_input: " + str(time.time() - start_time))
@@ -81,9 +81,10 @@ class CharaChat(Chat):
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
             best_of=self.setting["best_of"],
+            stop=["```"],
         )
         print("get_response: " + str(time.time() - start_time))
-        return response.choices[0].text.strip()
+        return "THOUGHT: " + response.choices[0].text.strip()
 
     def add_response(self, response: string, is_stable: bool = True):
         start_time = time.time()
@@ -105,6 +106,7 @@ class CharaChat(Chat):
             max_tokens=self.setting["max_tokens"],
             temperature=self.setting["temperature"],
             best_of=self.setting["best_of"],
+            stop=["```"],
         )
 
         tone_text = tone_response.choices[0].text.strip()

@@ -82,6 +82,7 @@ def combine_sayings(sayings: list, with_quotation=True):
                 result += f"{saying['content']}"
             else:
                 result += f"{saying['content']}\n"
+    result = result.rstrip("\n")
     return result
 
 

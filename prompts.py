@@ -10,20 +10,57 @@ from datetime import datetime
 def combine_settings(filtered_setting: dict):
     chara_settings = ""
     for key in filtered_setting.keys():
-        chara_settings += f"Character {key}:\n{filtered_setting[key]}\n\n"
+        # upper the first letter of the key
+        nKey = key[0].upper() + key[1:]
+        chara_settings += f"{nKey}:\n{filtered_setting[key]}\n\n"
+    chara_settings = chara_settings.rstrip("\n")
     return chara_settings
 
 
 def combine_history(history: list, userSet: dict):
     history_copy = deepcopy(history)
+    history_copy.pop()
     filtered_history = filter_history(
-        history=history_copy,
+        history=history_copy, 
         input=history[-1]["content"],
         num=100,
     )
     done_history = combine_sayings(filtered_history, with_quotation=False)
 
     return done_history
+
+
+def combine_examples(
+    chara: str, user: str, examples: list, include_performance: bool = False
+):
+    combined_examples = ""
+    for i, example in enumerate(examples):
+        combined_examples += f"__Example_{i+1}__:\n"
+        combined_examples += user.upper() + "\n"
+        combined_examples += example["message"] + "\n"
+        combined_examples += chara.upper() + "\n"
+        combined_examples += example["fields"] + "\n"
+        if include_performance:
+            combined_examples += f"PERFORMANCE: {example['performance']}\n"
+    combined_examples = combined_examples.rstrip("\n")
+    return combined_examples
+
+
+def extract_msg(user: str, msg: str):
+    if msg.startswith(user):
+        id = user.upper()
+        msg = msg[len(user) + 2 :]
+    else:
+        id = "HAPPENING"
+
+    # find the timing in the msg like 2023/11/03 09:54
+    time = msg[:16]
+    msg = msg[17:]
+
+    result = f"""```{time} {id}
+{msg}
+```"""
+    return result
 
 
 # PROMPTS FUNCTIONS
@@ -37,7 +74,16 @@ def get_fields_prompt(
     is_stable: bool = True,
 ):
     # preperation
+    if is_stable:
+        settings = combine_settings(filtered_setting=filtered_setting)
+    else:
+        settings = ""
+    examples = combine_examples(
+        chara=charaSet["name"], user=userSet["name"], examples=charaSet["examples"]
+    )
     combined_history = combine_history(history=history, userSet=userSet)
+    last_msg = history[-1]["content"]
+    last_msg = extract_msg(user=userSet["name"], msg=last_msg)
 
     # prompts
     prompt = f"""```MAIN CHARACTER
@@ -56,21 +102,17 @@ Character setting:
 Consider two fields in the response of {charaSet["name"]}: THOUGHT and ACTION, by taking {charaSet["name"]}'s personality and current scene into account.
 THOUGHT: A summary of the {charaSet["name"]}'s internal emotional state and thoughts.
 ACTION: A summary of the {charaSet["name"]}'s physical activities. Focus on the body movements and facial expressions.
-
-Example:
-LONG 
-I like your costume today, it's cute
-
-RINKO
-THOUGHT: Rinko is surprised by Long's comment. She would feel a mix of happiness and embarrassment at the compliment. She would be eager to show that this is the clothes for Roseilia's next live.
-ACTION: Rinko would blush, fidget nervously with her hands, and glance down at her outfit.
+{examples}
 ```
 
-```HISTORY
+```CONVERSATION
 {combined_history}
 ```
 
+{last_msg}
+
 ```{charaSet["name"].upper()}
+THOUGHT:
 """
 
     return prompt
@@ -85,14 +127,27 @@ def get_script_prompt(
     is_stable: bool = True,
 ):
     # preperation
+    if is_stable:
+        settings = combine_settings(filtered_setting=filtered_setting)
+    else:
+        settings = ""
+    examples = combine_examples(
+        chara=charaSet["name"],
+        user=userSet["name"],
+        examples=charaSet["examples"],
+        include_performance=True,
+    )
     combined_history = combine_history(history=history, userSet=userSet)
-    timing = datetime.now().strftime("%Y/%m/%d %H:%M")
+    last_msg = history[-1]["content"]
+    last_msg = extract_msg(user=userSet["name"], msg=last_msg)
 
     # prompts
     result = f"""```MAIN CHARACTER
 Character name: {charaSet['name']}
 Character setting: 
 {charaSet["introduction"]}
+
+{settings}
 ```
 
 ```SECOND CHARACTER
@@ -104,15 +159,17 @@ Character setting:
 ```REQUIREMENTS
 Consider {charaSet['name']}'s next performance in response to what just happened, in {charaSet['name']}'s tone and personality.
 In the story, {charaSet['name']}'s physical actions should be put between brackets []. Actions and words of {charaSet['name']} should appear alternately. 
-Example: [Motion] Words [Motion] Words
+{examples}
 ```
 
-```HISTORY
+```CONVERSATION
 {combined_history}
 ```
 
+{last_msg}
+
 ```{charaSet["name"].upper()}
 {fields}
-PERFORMANCE: {timing} {charaSet["name"]}:"""
+PERFORMANCE:"""
 
     return result
