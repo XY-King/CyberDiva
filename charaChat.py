@@ -30,7 +30,7 @@ class CharaChat(Chat):
         # filter the settings
         for key in keys:
             values = self.chara[key]
-            filter_num = int(TOTAL_LENGTH * (len(values) / values_total_length))
+            filter_num = int(TOTAL_LENGTH * (len(values["content"]) / values_total_length))
             filtered_values = filter_sayings(
                 sayings=values["content"],
                 embeddings=values["embedding"],
@@ -67,10 +67,10 @@ class CharaChat(Chat):
             charaSet=self.chara,
             userSet=self.user,
             filtered_setting=self.filtered_setting,
-            history=self.history["content"],
+            history=filtered_history,
             is_stable=is_stable,
         )
-        with open("init_msg.txt", "w", encoding="UTF-8") as f:
+        with open("fields.txt", "w", encoding="UTF-8") as f:
             f.write(prompt)
 
         response = openai.Completion.create(
@@ -86,10 +86,16 @@ class CharaChat(Chat):
 
     def add_response(self, response: string, is_stable: bool = True):
         start_time = time.time()
+        filtered_history = filter_history(
+            self.history["content"],
+            self.history["embedding"],
+            input=self.history["content"][-1]["content"],
+            num=256,
+        )
         tone_prompt = get_script_prompt(
             charaSet=self.chara,
             userSet=self.user,
-            history=self.history["content"], 
+            history=filtered_history,
             fields=response,
             filtered_setting=self.filtered_setting,
             is_stable=is_stable,

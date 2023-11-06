@@ -2,7 +2,14 @@ import json
 from charaChat import CharaChat
 from read import get_chara_config, get_user_config
 from flask import Flask, request, render_template
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QHBoxLayout   
+from PyQt5.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QWidget,
+    QVBoxLayout,
+    QPushButton,
+    QHBoxLayout,
+)
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtGui import QCursor
@@ -14,6 +21,7 @@ print("starting...")
 app = Flask(__name__)
 set_api_key()
 app_port = 5000
+
 
 @app.route("/")
 def index():
@@ -36,14 +44,15 @@ def chat():
     print(user_input)
     core.user_input(user_input)
     response = core.get_response()
-    print(response)
     action_list = core.add_response(response=response)
     for reaction in action_list:
         print(reaction)
     return {"action_list": action_list}
 
+
 def run_app():
     app.run(host="localhost", port=app_port, debug=False)
+
 
 class MainWindow(QMainWindow):
     m_drag_position = None
@@ -52,8 +61,9 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         # The circle widget
-        self.button = QPushButton('')
-        self.button.setStyleSheet("""
+        self.button = QPushButton("")
+        self.button.setStyleSheet(
+            """
             QPushButton {
                 background-color: purple;
                 border: none;
@@ -61,7 +71,8 @@ class MainWindow(QMainWindow):
                 min-width: 40px;
                 min-height: 40px;
             }
-        """)
+        """
+        )
         self.button.pressed.connect(self.start_drag)
 
         # The web view
@@ -95,6 +106,7 @@ class MainWindow(QMainWindow):
     def mouseReleaseEvent(self, event):
         QApplication.restoreOverrideCursor()
         MainWindow.m_drag_position = None
+
 
 if __name__ == "__main__":
     change_language()

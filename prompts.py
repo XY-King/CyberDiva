@@ -37,13 +37,8 @@ def extract_msg(user: str, msg: str):
     else:
         id = "HAPPENING"
 
-    # find the timing in the msg like 2023/11/03 09:54
-    time = msg[:16]
-    msg = msg[17:]
-
-    result = f"""```{time} {id}
-{msg}
-```"""
+    result = f"""{id}
+{msg}"""
     return result
 
 
@@ -65,12 +60,19 @@ def get_fields_prompt(
     examples = combine_examples(
         chara=charaSet["name"], user=userSet["name"], examples=charaSet["examples"]
     )
-    combined_history = combine_sayings(sayings=history, with_quotation=False)
-    last_msg = history[-1]["content"]
+    combined_history = combine_sayings(sayings=history[:-1], with_quotation=False)
+    last_msg = history[-1]
     last_msg = extract_msg(user=userSet["name"], msg=last_msg)
 
     # prompts
-    prompt = f"""```MAIN CHARACTER
+    prompt = f"""```REQUIREMENTS
+Consider two fields in the performance of {charaSet["name"]}: THOUGHT and ACTION, by taking {charaSet["name"]}'s personality and current scene into account.
+THOUGHT: A summary of the {charaSet["name"]}'s internal emotional state and thoughts.
+ACTION: A summary of the {charaSet["name"]}'s physical activities. Focus on the body movements and facial expressions.
+{examples}
+```
+    
+```MAIN CHARACTER
 Character name: {charaSet['name']}
 Character setting: 
 {charaSet["introduction"]}
@@ -82,20 +84,13 @@ Character setting:
 {userSet["setting"]} 
 ```
 
-```REQUIREMENTS
-Consider two fields in the response of {charaSet["name"]}: THOUGHT and ACTION, by taking {charaSet["name"]}'s personality and current scene into account.
-THOUGHT: A summary of the {charaSet["name"]}'s internal emotional state and thoughts.
-ACTION: A summary of the {charaSet["name"]}'s physical activities. Focus on the body movements and facial expressions.
-{examples}
-```
-
-```CONVERSATION
+```SCENE
 {combined_history}
 ```
 
+```FOLLOWING
 {last_msg}
-
-```{charaSet["name"].upper()}
+{charaSet["name"].upper()}  
 THOUGHT:
 """
 
@@ -111,22 +106,25 @@ def get_script_prompt(
     is_stable: bool = True,
 ):
     # preperation
-    if is_stable:
-        settings = combine_settings(filtered_setting=filtered_setting)
-    else:
-        settings = ""
+    settings = combine_settings(filtered_setting=filtered_setting)
     examples = combine_examples(
         chara=charaSet["name"],
         user=userSet["name"],
         examples=charaSet["examples"],
         include_performance=True,
     )
-    combined_history = combine_sayings(sayings=history, with_quotation=False)
-    last_msg = history[-1]["content"]
+    combined_history = combine_sayings(sayings=history[:-1], with_quotation=False)
+    last_msg = history[-1]
     last_msg = extract_msg(user=userSet["name"], msg=last_msg)
 
     # prompts
-    result = f"""```MAIN CHARACTER
+    result = f"""```REQUIREMENTS
+Consider the following performance of {charaSet['name']}, by taking {charaSet["name"]}'s personality and current scene into account.
+In the story, {charaSet['name']}'s physical actions should be put between brackets []. Actions and words of {charaSet['name']} should appear alternately. 
+{examples}
+```
+
+```MAIN CHARACTER
 Character name: {charaSet['name']}
 Character setting: 
 {charaSet["introduction"]}
@@ -140,19 +138,13 @@ Character setting:
 {userSet["setting"]} 
 ```
 
-```REQUIREMENTS
-Consider {charaSet['name']}'s next performance in response to what just happened, in {charaSet['name']}'s tone and personality.
-In the story, {charaSet['name']}'s physical actions should be put between brackets []. Actions and words of {charaSet['name']} should appear alternately. 
-{examples}
-```
-
-```CONVERSATION
+```SCENE
 {combined_history}
 ```
 
+```FOLLOWING
 {last_msg}
-
-```{charaSet["name"].upper()}
+{charaSet["name"].upper()}
 {fields}
 PERFORMANCE:"""
 

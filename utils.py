@@ -20,21 +20,22 @@ def filter_sayings(
     # get the first {num} sayings
     pairs = pairs[:num]
     # output the result into a list
-    result_sayings = []
-    for pair in pairs:
-        result_sayings.append(sayings[pair["index"]])
-    
+    result_sayings = deepcopy(sayings)
+    for i in range(len(result_sayings)):
+        if not i in [pair["index"] for pair in pairs]:
+            result_sayings[i] = None
+    result_sayings = [saying for saying in result_sayings if saying != None]
     return result_sayings
 
 
 # filter the history, the filter result musty have pairs of user and assistant
 def filter_history(history: list, history_embeddings: list, input: str, num: int):
     # add index to the history
-    history_copy = deepcopy(history)
-    for i in range(len(history_copy)):
-        history_copy[i]["index"] = i
+    pairs = []
+    for i in range(len(history)):
+        pairs.append({"index": i, "role": history[i]["role"], "content": history[i]["content"]})
     filtered_history = filter_sayings(
-        sayings=history_copy,
+        sayings=pairs,
         embeddings=history_embeddings,
         input=input,
         num=num,
@@ -43,17 +44,15 @@ def filter_history(history: list, history_embeddings: list, input: str, num: int
     result = []
     for msg in filtered_history:
         if msg["role"] == "user":
-            result.append(history_copy[msg["index"]])
-            if msg["index"] < len(history_copy) - 1:
-                if not history_copy[msg["index"] + 1] in filtered_history:
-                    result.append(history_copy[msg["index"] + 1])
+            result.append(pairs[msg["index"]])
+            if msg["index"] < len(pairs) - 1:
+                if not pairs[msg["index"] + 1] in filtered_history:
+                    result.append(pairs[msg["index"] + 1])
         else:
-            if not history_copy[msg["index"] - 1] in filtered_history:
-                result.append(history_copy[msg["index"] - 1])
-            result.append(history_copy[msg["index"]])
-    for msg in result:
-        msg.pop("index")
-    return result
+            if not pairs[msg["index"] - 1] in filtered_history:
+                result.append(pairs[msg["index"] - 1])
+            result.append(pairs[msg["index"]])
+    return [msg["content"] for msg in result]
 
 
 # combine a list of sayings with embeddings into one string
@@ -62,9 +61,9 @@ def combine_sayings(sayings: list, with_quotation=True):
     for i, saying in enumerate(sayings):
         if with_quotation:
             if i == len(sayings) - 1:
-                result += f"\"{saying}\""
+                result += f'"{saying}"'
             else:
-                result += f"\"{saying}\"\n"
+                result += f'"{saying}"\n'
         else:
             if i == len(sayings) - 1:
                 result += f"{saying}"
