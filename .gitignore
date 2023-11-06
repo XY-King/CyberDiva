@@ -2,6 +2,7 @@ __pycache__/
 .vscode/
 my_user.json
 my_key.json
+fields.txt
 prompt.txt
 history.txt
 TODO.md
