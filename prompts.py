@@ -1,9 +1,6 @@
 import string
-from openai.embeddings_utils import cosine_similarity
-from config import get_embedding, get_embeddings
-from utils import filter_sayings, filter_history, combine_sayings
+from utils import filter_history, combine_sayings
 from copy import deepcopy
-from datetime import datetime
 
 
 # HELPER FUNCTIONS
@@ -11,23 +8,10 @@ def combine_settings(filtered_setting: dict):
     chara_settings = ""
     for key in filtered_setting.keys():
         # upper the first letter of the key
-        nKey = key[0].upper() + key[1:]
+        nKey = key.capitalize()
         chara_settings += f"{nKey}:\n{filtered_setting[key]}\n\n"
     chara_settings = chara_settings.rstrip("\n")
     return chara_settings
-
-
-def combine_history(history: list, userSet: dict):
-    history_copy = deepcopy(history)
-    history_copy.pop()
-    filtered_history = filter_history(
-        history=history_copy, 
-        input=history[-1]["content"],
-        num=100,
-    )
-    done_history = combine_sayings(filtered_history, with_quotation=False)
-
-    return done_history
 
 
 def combine_examples(
@@ -81,7 +65,7 @@ def get_fields_prompt(
     examples = combine_examples(
         chara=charaSet["name"], user=userSet["name"], examples=charaSet["examples"]
     )
-    combined_history = combine_history(history=history, userSet=userSet)
+    combined_history = combine_sayings(sayings=history, with_quotation=False)
     last_msg = history[-1]["content"]
     last_msg = extract_msg(user=userSet["name"], msg=last_msg)
 
@@ -137,7 +121,7 @@ def get_script_prompt(
         examples=charaSet["examples"],
         include_performance=True,
     )
-    combined_history = combine_history(history=history, userSet=userSet)
+    combined_history = combine_sayings(sayings=history, with_quotation=False)
     last_msg = history[-1]["content"]
     last_msg = extract_msg(user=userSet["name"], msg=last_msg)
 

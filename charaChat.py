@@ -4,11 +4,9 @@ from prompts import (
     get_fields_prompt,
     get_script_prompt,
 )
-from read import get_chara_setting_keys
 import openai
 import time
-from utils import filter_sayings, combine_sayings, with_embedding, filter_history
-from stabilize import read_stabilizer
+from utils import filter_sayings, combine_sayings, filter_history
 from datetime import datetime
 
 
@@ -18,24 +16,24 @@ class CharaChat(Chat):
         self.chara = charaSet
         self.user = userSet
         self.filtered_setting = []
-        # read_stabilizer(self)
 
     def get_filtered_setting(self, input: string):
         TOTAL_LENGTH = 2000
         self.filtered_setting = {}
         # get the keys in the charaInit for character setting
-        keys = get_chara_setting_keys(self.chara["name"])
+        keys = self.chara["setting_keys"]
         # allocate the number of sayings to be filtered for each key
         values_total_length = 0
         for key in keys:
-            for value in self.chara[key]:
-                values_total_length += len(value["content"])
+            for value in self.chara[key]["content"]:
+                values_total_length += len(value)
         # filter the settings
         for key in keys:
             values = self.chara[key]
             filter_num = int(TOTAL_LENGTH * (len(values) / values_total_length))
             filtered_values = filter_sayings(
-                sayings=values,
+                sayings=values["content"],
+                embeddings=values["embedding"],
                 input=input,
                 num=filter_num,
             )
@@ -50,26 +48,26 @@ class CharaChat(Chat):
         if not nohuman:
             input = self.user["name"] + ": " + input
 
-        self.history.append(with_embedding({"role": "user", "content": input}))
+        super().user_input(input)
         print("user_input: " + str(time.time() - start_time))
 
     def get_response(self, is_stable: bool = True):
         start_time = time.time()
         filtered_history = filter_history(
-            self.history, input=self.history[-1]["content"], num=256
+            self.history["content"],
+            self.history["embedding"],
+            input=self.history["content"][-1]["content"],
+            num=256,
         )
-        for msg in filtered_history:
-            msg.pop("embedding")
-
         with open("history.txt", "w", encoding="UTF-8") as f:
             f.write(str(filtered_history))
 
-        self.get_filtered_setting(self.history[-1]["content"])
+        self.get_filtered_setting(self.history["content"][-1]["content"])
         prompt = get_fields_prompt(
             charaSet=self.chara,
             userSet=self.user,
             filtered_setting=self.filtered_setting,
-            history=self.history,
+            history=self.history["content"],
             is_stable=is_stable,
         )
         with open("init_msg.txt", "w", encoding="UTF-8") as f:
@@ -91,7 +89,7 @@ class CharaChat(Chat):
         tone_prompt = get_script_prompt(
             charaSet=self.chara,
             userSet=self.user,
-            history=self.history,
+            history=self.history["content"], 
             fields=response,
             filtered_setting=self.filtered_setting,
             is_stable=is_stable,
@@ -112,14 +110,7 @@ class CharaChat(Chat):
         tone_text = tone_response.choices[0].text.strip()
         tone_text = self.chara["name"] + ": " + tone_text
 
-        self.history.append(
-            with_embedding(
-                {
-                    "role": "assistant",
-                    "content": tone_text,
-                }
-            )
-        )
+        super().add_response(tone_text)
         print("add_response: " + str(time.time() - start_time))
         return pair_response_list(
             response_list=seperate_response(tone_text, self.chara),
@@ -128,7 +119,7 @@ class CharaChat(Chat):
 
     def print_history(self):
         # os.system("cls")
-        for _msg in self.history:
+        for _msg in self.history["content"]:
             msg = _msg["content"]
             if msg["role"] == "user":
                 print("You: " + msg["content"])
@@ -170,15 +161,14 @@ def get_index(substring: string, string: string):
     return len(string)
 
 
-def pair_response_list(response_list: list, chara_motions: list):
-    def get_motion(motion: string):
+def pair_response_list(response_list: list, chara_motions: dict):
+    def get_motion(motion: str):
         motion = filter_sayings(
-            sayings=chara_motions,
+            sayings=chara_motions["content"],
+            embeddings=chara_motions["embedding"],
             input=motion,
             num=1,
-        )[
-            0
-        ]["content"]
+        )[0]
         return motion
 
     response_pairs = []

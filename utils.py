@@ -1,53 +1,41 @@
 from config import get_embedding
-from openai.embeddings_utils import cosine_similarity
 from copy import deepcopy
 import locale
-
-
-def with_embedding(msg: dict):
-    msg_copy = deepcopy(msg)
-    embedding = get_embedding(msg["content"])
-    msg_copy["embedding"] = embedding
-    return msg_copy
+from sentence_transformers import util
+import numpy as np
 
 
 # filter the sayings by the relation with the input and return the top {num} sayings
-def filter_sayings(sayings: list, input: str, num: int, is_stable: bool = False):
-    sayings_copy = deepcopy(sayings)
+def filter_sayings(
+    sayings: list, embeddings: list, input: str, num: int, is_stable: bool = False
+):
     input_embedding = get_embedding(input)
-    for saying in sayings_copy:
-        relation = cosine_similarity(input_embedding, saying["embedding"])
-        saying["relation"] = relation
+    cos_sim = util.cos_sim(input_embedding, np.array(embeddings))[0]
+    pairs = []
+    for i, saying in enumerate(sayings):
+        pairs.append({"index": i, "relation": cos_sim[i]})
 
-    if not is_stable:
-        # sort the sayings by the relation from the highest to the lowest
-        sayings_copy.sort(key=lambda x: x["relation"], reverse=True)
-        # get the first {num} sayings
-        sayings_copy = sayings_copy[:num]
-    else:
-        # keep the sayings order and return the sayings with top {num} relations
-        sayings_sorted = deepcopy(sayings_copy)
-        sayings_sorted.sort(key=lambda x: x["relation"], reverse=True)
-        sayings_sorted = sayings_sorted[:num]
-        for i, saying in enumerate(sayings_copy):
-            if not saying in sayings_sorted:
-                sayings_copy[i] = None
-        sayings_copy = list(filter(lambda x: x != None, sayings_copy))
-
-    for saying in sayings_copy:
-        saying.pop("relation")
-
-    return sayings_copy
+    # sort the sayings by the relation from the highest to the lowest
+    pairs.sort(key=lambda x: x["relation"], reverse=True)
+    # get the first {num} sayings
+    pairs = pairs[:num]
+    # output the result into a list
+    result_sayings = []
+    for pair in pairs:
+        result_sayings.append(sayings[pair["index"]])
+    
+    return result_sayings
 
 
 # filter the history, the filter result musty have pairs of user and assistant
-def filter_history(history: list, input: str, num: int):
+def filter_history(history: list, history_embeddings: list, input: str, num: int):
     # add index to the history
     history_copy = deepcopy(history)
     for i in range(len(history_copy)):
         history_copy[i]["index"] = i
     filtered_history = filter_sayings(
         sayings=history_copy,
+        embeddings=history_embeddings,
         input=input,
         num=num,
         is_stable=True,
@@ -74,14 +62,14 @@ def combine_sayings(sayings: list, with_quotation=True):
     for i, saying in enumerate(sayings):
         if with_quotation:
             if i == len(sayings) - 1:
-                result += f"\"{saying['content']}\""
+                result += f"\"{saying}\""
             else:
-                result += f"\"{saying['content']}\"\n"
+                result += f"\"{saying}\"\n"
         else:
             if i == len(sayings) - 1:
-                result += f"{saying['content']}"
+                result += f"{saying}"
             else:
-                result += f"{saying['content']}\n"
+                result += f"{saying}\n"
     result = result.rstrip("\n")
     return result
 
