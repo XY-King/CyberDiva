@@ -14,6 +14,7 @@ A New-era implementation of interaction between human and imaginary characters. 
 ### OpenAI settings
 - Fill in your openai api key in the `api_key` field in `json/config.json`
 - GPT engine to use can be changed in `json/config.json`. 
+
 | Model                  | Pros and Cons                                                                                           |
 | ---------------------- | ------------------------------------------------------------------------------------------------------- |
 | gpt-instruct-turbo-3.5 | Default model chosen. Responds very fast and features lively conversations.                             |
