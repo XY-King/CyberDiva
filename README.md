@@ -48,7 +48,7 @@ The `examples.json` file should be lists of dicts, each dict containing the foll
 
 This file is important for you to have a stable conversation with the character. 
 
-You do not need to create such files at the beginning of character creation by yourself. When chosen a character without this file, you only need to follow the instructions in the window to create this file.
+You do not need to create such files at the beginning of character creation by yourself. When chosen a character whose directory is without this file, you only need to follow the instructions in the window to create this file.
 
 ### live2d/
 The Live2D directory should be in Cubism 2 format. Essential files include:
